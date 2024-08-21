@@ -1,0 +1,22 @@
+{varType Northrook\UI\Component\Notification $notification}
+<toast {$notification->attr()|noescape}>
+    <button class="close" aria-label="Close" type="button">
+        <i class="close"></i>
+    </button>
+    <output>
+        <i class="status">
+            {$notification->icon|noescape}
+            <span class="status-type">
+                    {$notification->type|noescape}
+            </span>
+        </i>
+        <span class="message">
+            {$notification->message|formatInline|noescape}
+        </span>
+    </output>
+    <time datetime="{$notification->timestamp(DATE_W3C)}">{$notification->when}</time>
+    <details n:if="$notification->description" class="description">
+        <summary>Description</summary>
+        {$notification->description|nl2auto}
+    </details>
+</toast>

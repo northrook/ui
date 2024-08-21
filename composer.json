@@ -1,0 +1,28 @@
+{
+  "name": "northrook/ui",
+  "type": "library",
+  "description": "Customisable components for PHP.",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Northrook\\UI\\": "src"
+    }
+  },
+  "authors": [
+    {
+      "name": "Martin",
+      "email": "mn@northrook.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require": {
+    "php": ">=8.3",
+    "northrook/latte-bundle": "dev-main"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "@stable",
+    "northrook/dev-env": "dev-main",
+    "northrook/symfony-document": "dev-main"
+  }
+}

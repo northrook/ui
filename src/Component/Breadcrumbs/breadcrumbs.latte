@@ -1,0 +1,31 @@
+{varType Northrook\UI\Component\Breadcrumbs $breadcrumbs}
+
+{* aria-label pulls from translation table*}
+
+<ol n:if="$breadcrumbs->list()" {$breadcrumbs->attr( )|noescape}
+        vocab="https://schema.org/"
+        typeof="BreadcrumbList"
+>
+    <li n:foreach="$breadcrumbs->list() as $position => $item"
+        n:class="$item->classes" property="itemListElement" typeof="ListItem">
+        {if $item->href}
+            <a typeof="{$item->type}"
+               href="{$item->href}"
+               property="item"
+               target="_self"
+                    n:attr="aria-hidden: $item->current ? 'page' : null"
+            >
+                {if $item->icon}
+                    {$item->icon|noescape}
+                {/if}
+                <span property="name">{$item->title}</span>
+            </a>
+        {else}
+            {if $item->icon}
+                {$item->icon|noescape}
+            {/if}
+            <span property="name">{$item->title}</span>
+        {/if}
+        <meta property="position" content="{$item->position ?: $position}">
+    </li>
+</ol>
