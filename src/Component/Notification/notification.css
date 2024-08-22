@@ -1,3 +1,34 @@
+section#notifications {
+    position       : fixed;
+    top            : var(--top-offset);
+    right          : var(--right-offset);
+    z-index        : 125;
+    min-width      : 210px;
+    max-width      : 80vw;
+    display        : flex;
+    flex-direction : column;
+    align-items    : flex-end;
+}
+
+section#notifications > toast {
+    --accent         : var(--outline);
+    position         : relative;
+    display          : flex;
+    flex-direction   : column;
+    font-size        : 0.875rem;
+    /*background-color	: hsla(var(--baseline-900));*/
+    background-color : hsla(var(--baseline-900), .85);
+    backdrop-filter  : blur(5px);
+    border-radius    : 0.25rem;
+    opacity          : 1;
+    transform        : translateX(0);
+    transition       : opacity 200ms ease, transform 200ms ease, max-height 200ms ease, margin 200ms ease, background-color 200ms ease;
+    max-height       : 120px;
+    margin-bottom    : var(--gap);
+    overflow         : hidden;
+    box-shadow       : 1px 1px 6px -2px var(--shadow-color);
+}
+
 toast {
     position           : relative;
     display            : flex;
@@ -15,6 +46,10 @@ toast {
     margin-bottom      : var(--admin-bar-padding, .5rem);
     box-shadow         : 1px 1px 6px -2px hsl(var(--shadow)), 0 1px 0 var(--item-border-color);
     overflow           : hidden;
+}
+
+toast:hover, toast:focus-within, toast:focus {
+    background-color : hsla(var(--baseline-900), 1);
 }
 
 toast.success {
@@ -62,6 +97,25 @@ toast.hidden {
     transform     : translateX(50%);
     max-height    : 0;
     margin-bottom : 0;
+}
+
+
+section > toast > button.close {
+    position   : absolute;
+    top        : 0;
+    right      : 0;
+    opacity    : .25;
+    transition : opacity 200ms ease;
+}
+
+section > toast > button.close:focus-visible,
+section > toast > button.close:hover {
+    opacity : 1;
+}
+
+section > toast:focus-within > button.close,
+section > toast:hover > button.close {
+    opacity : .5;
 }
 
 toast.success:not(.hidden)::after {
