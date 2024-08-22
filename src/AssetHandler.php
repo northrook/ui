@@ -7,7 +7,8 @@ use function Northrook\normalizePath;
 
 final class AssetHandler
 {
-    private array $assetDirectories = []; // Alternative locations for Component Assets
+    // Alternative locations for Component Assets
+    private array $assetDirectories = [];
 
     public function __construct(
         string | array $assetDirectories = [],
@@ -20,7 +21,6 @@ final class AssetHandler
             if ( !\is_dir( $file ) ) {
                 continue;
             }
-
             $this->assetDirectories[] = normalizePath( $file );
         }
     }
