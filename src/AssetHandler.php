@@ -51,6 +51,10 @@ final class AssetHandler
             foreach ( $className::getAssets() as $asset ) {
                 $asset = new Path( $asset );
 
+                if ( ! $asset->exists ) {
+                    continue;
+                }
+
                 $assets[] = match ( $asset->extension ) {
                     'css'   => new Style( $asset, [ 'component' => $component ] ),
                     'js'    => new Script( $asset, [ 'component' => $component ] ),
