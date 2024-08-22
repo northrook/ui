@@ -2,6 +2,9 @@
 
 namespace Northrook\UI;
 
+use Northrook\Asset\Script;
+use Northrook\Asset\Style;
+use Northrook\Resource\Path;
 use Northrook\UI\Latte\ComponentRuntime;
 use function Northrook\normalizePath;
 
@@ -44,7 +47,16 @@ final class AssetHandler
                 continue;
             }
 
-            $assets = [ ...$assets, ... $className::getAssets() ];
+            // Prepare each Component Asset
+            foreach ( $className::getAssets() as $asset ) {
+                $asset = new Path( $asset );
+
+                $assets[] = match ( $asset->extension ) {
+                    'css'   => new Style( $asset, [ 'component' => $component ] ),
+                    'js'    => new Script( $asset, [ 'component' => $component ] ),
+                    default => $asset,
+                };
+            }
         }
 
         return $assets;
