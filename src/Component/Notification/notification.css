@@ -1,7 +1,7 @@
 section#notifications {
     position       : fixed;
     top            : var(--offset-top);
-    right          : var(--offset-right s);
+    right          : var(--offset-right);
     z-index        : 125;
     min-width      : 210px;
     max-width      : 80vw;
