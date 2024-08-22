@@ -8,6 +8,7 @@ use Latte\Runtime\Html;
 use Latte\Runtime\HtmlStringable;
 use Northrook\HTML\Element\Attributes;
 use Northrook\Latte;
+use Northrook\UI\AssetHandler;
 use function Northrook\classBasename;
 use function Northrook\hashKey;
 
@@ -49,6 +50,7 @@ abstract class Component implements HtmlStringable, ComponentInterface
     }
 
     function __toString() : string {
+        AssetHandler::register( $this->templateType, $this::class );
         return $this->render();
     }
 

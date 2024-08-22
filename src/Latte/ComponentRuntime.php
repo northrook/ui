@@ -7,7 +7,7 @@ namespace Northrook\UI\Latte;
 use Latte\Runtime\Html;
 use Latte\Runtime\HtmlStringable;
 use Northrook\UI\Component\Breadcrumbs;
-use Northrook\UI\Component\Highlighter;
+use Northrook\UI\Component\Code;
 use Northrook\UI\Component\Menu;
 use Northrook\UI\Component\Notification;
 use Northrook\Logger\Log;
@@ -18,30 +18,19 @@ use Psr\Log\LoggerInterface;
  */
 final class ComponentRuntime
 {
-    use SingletonClass;
-
     /**
      * @var array{non-empty-string: class-string}
      */
     public const array COMPONENTS = [
         'breadcrumbs'  => Breadcrumbs::class,
         'notification' => Notification::class,
-        // 'highlighter'  => Highlighter::class,
-        // 'menu'         => Menu::class,
+        'code'         => Code::class,
+        'menu'         => Menu::class,
     ];
-
-    private array $calledComponents = [];
 
     public function __construct(
         private readonly array $componentCallback = [],
-    ) {
-        $this->instantiationCheck();
-        $this::$instance = $this;
-    }
-
-    public static function getCalled() : array {
-        return ComponentRuntime::getInstance()->calledComponents;
-    }
+    ) {}
 
     public function __call( string $name, array $arguments ) : ?HtmlStringable {
 
@@ -65,10 +54,6 @@ final class ComponentRuntime
                 ],
             );
             return null;
-        }
-
-        if ( !isset( $this->calledComponents[ $component ] ) ) {
-            $this->calledComponents[ $name ] = $component;
         }
 
         return new Html( (string) $render );
