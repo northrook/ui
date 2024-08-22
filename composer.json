@@ -23,6 +23,7 @@
   "require-dev": {
     "phpstan/phpstan": "@stable",
     "northrook/dev-env": "dev-main",
-    "northrook/symfony-document": "dev-main"
+    "northrook/symfony-document": "dev-main",
+    "northrook/symfony-core-bundle": "dev-main"
   }
 }

@@ -85,7 +85,6 @@ final class Notification extends Component
         ];
     }
 
-
     /**
      * Format the most recent timestamp object
      *
