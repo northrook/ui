@@ -34,14 +34,17 @@ final class AssetHandler
     }
 
     public function getComponentAssets( array $filter = [] ) : array {
+
         $assets = [];
 
-        $called = $this::$calledComponents;
-        
-        // filter out both [type => className] from $filter
+        foreach ( $this::$calledComponents as $component => $className ) {
 
-        foreach ( $called as $component => $className ) {
-            $assets += $className::getAssets();
+            // Do not get assets for these components
+            if ( \in_array( $component, $filter, false ) ) {
+                continue;
+            }
+
+            $assets = [ ...$assets, ... $className::getAssets() ];
         }
 
         return $assets;
