@@ -1,95 +1,40 @@
-section#notifications {
-    position       : fixed;
-    top            : var(--offset-top);
-    right          : var(--offset-right);
-    z-index        : 125;
-    min-width      : 210px;
-    max-width      : 80vw;
-    display        : flex;
-    flex-direction : column;
-    align-items    : flex-end;
-}
-
-section#notifications > toast {
-    --accent         : var(--outline);
-    position         : relative;
-    display          : flex;
-    flex-direction   : column;
-    font-size        : 0.875rem;
-    /*background-color	: hsla(var(--baseline-900));*/
-    background-color : hsla(var(--baseline-900), .85);
-    backdrop-filter  : blur(5px);
-    border-radius    : 0.25rem;
-    opacity          : 1;
-    transform        : translateX(0);
-    transition       : opacity 200ms ease, transform 200ms ease, max-height 200ms ease, margin 200ms ease, background-color 200ms ease;
-    max-height       : 120px;
-    margin-bottom    : var(--gap);
-    overflow         : hidden;
-    box-shadow       : 1px 1px 6px -2px var(--shadow-color);
+#notifications {
+    max-width : 80vw;
 }
 
 toast {
-    position           : relative;
-    display            : flex;
-    grid-template-rows : 1fr;
-    /*background-color	: hsla(var(--baseline-900));*/
-    /*background-color   : color-mix(in var(--baseline-900) );*/
-    background         : color-mix(in lch, var(--baseline-900), transparent 5%);
-    font-size          : 0.875rem;
-    backdrop-filter    : blur(5px);
-    border-radius      : 0.25rem;
-    opacity            : 1;
-    transform          : translateX(0);
-    transition         : opacity 200ms ease, transform 200ms ease, max-height 200ms ease, margin 200ms ease;
-    max-height         : 120px;
-    margin-bottom      : var(--admin-bar-padding, .5rem);
-    box-shadow         : 1px 1px 6px -2px hsl(var(--shadow)), 0 1px 0 var(--item-border-color);
-    overflow           : hidden;
+    position        : relative;
+
+    max-height      : 8rem;
+    min-width       : 210px;
+    margin-bottom   : var(--gap);
+    border-radius   : .25rem;
+
+    font-size       : var(--font-size-small);
+
+    transition      : opacity 200ms ease, transform 200ms ease, max-height 200ms ease, margin 200ms ease, background-color 200ms ease;
+    transform       : translateX(0);
+    opacity         : 1;
+
+    backdrop-filter : blur(5px);
+    box-shadow      : 1px 1px 1rem -.125rem var(--shadow-color);
 }
 
-toast:hover, toast:focus-within, toast:focus {
-    background-color : hsla(var(--baseline-900), 1);
+/* Background */
+toast::before {
+    content       : '';
+    z-index       : -1;
+    position      : absolute;
+    border-radius : .25rem;
+    inset         : 0;
+    background    : linear-gradient(-55deg, var(--background) 50%, var(--status-light) 100%);
+    transition    : opacity 300ms ease-in-out;
+    opacity       : .50;
 }
 
-toast.success {
-    --color-status : var(--success);
-}
-
-toast.info {
-    --color-status : var(--info);
-}
-
-toast.notice {
-    --color-status : var(--notice);
-}
-
-toast.warning {
-    --color-status : var(--warning);
-}
-
-toast.danger {
-    --color-status : var(--danger);
-}
-
-toast i.status {
-    display     : flex;
-    align-items : center;
-    gap         : .5rem;
-    line-height : 1;
-    color       : var(--color-status);
-}
-
-toast i.status svg.icon {
-    height : 1em;
-    width  : 1em;
-}
-
-toast output {
-    display  : flex;
-    padding  : .75rem 2rem .75rem .75rem;
-    gap      : 0.5rem;
-    overflow : hidden;
+/* Background:Hover */
+toast:hover::before, toast:focus-within::before, toast:focus::before {
+    opacity : .95;
 }
 
 toast.hidden {
@@ -99,6 +44,57 @@ toast.hidden {
     margin-bottom : 0;
 }
 
+
+/* Spoken aloud */
+toast output {
+    display        : flex;
+    flex-direction : column;
+    padding        : .75rem 2rem .75rem .75rem;
+    gap            : 0.5rem;
+    overflow       : hidden;
+}
+
+/* Status */
+
+toast i.status {
+    display     : flex;
+    align-items : center;
+    gap         : .5rem;
+    line-height : 1;
+}
+
+toast i.status svg.icon {
+    height : 1em;
+    width  : 1em;
+    color  : var(--status);
+}
+
+toast i.status > span {
+    height         : 1em;
+    color          : var(--status);
+    text-transform : capitalize;
+}
+
+toast i.status > time {
+    position     : absolute;
+    width        : 1px;
+    height       : 1px;
+    padding      : 0;
+    margin       : -1px;
+    overflow     : hidden;
+    clip         : rect(0, 0, 0, 0);
+    white-space  : nowrap;
+    border-width : 0;
+}
+
+toast.compact output {
+    flex-direction : row;
+}
+
+toast.compact i.status > span,
+toast.compact i.status > time {
+    display : none;
+}
 
 section > toast > button.close {
     position   : absolute;
@@ -118,31 +114,39 @@ section > toast:hover > button.close {
     opacity : .5;
 }
 
-toast.success:not(.hidden)::after {
+toast > div.progress-bar {
+    content        : '';
+    position       : absolute;
+    right          : 0;
+    bottom         : 0;
+    height         : .25rem;
+    width          : 100%;
+    border-radius  : 0 0 .25rem .25rem;
+    pointer-events : none;
+    /*transition     : opacity 200ms ease;*/
+    opacity        : 1;
+    z-index        : -1;
+    overflow       : hidden;
+}
+toast:not(.hidden) > div.progress-bar::after {
     content          : '';
     position         : absolute;
     right            : 0;
     bottom           : 0;
     /*height				: 100%;*/
-    height           : 2px;
+    height           : .125rem;
     width            : 100%;
-
-    background-color : hsl(var(--success), .15);
-    /*background		: linear-gradient(transparent, hsl(var(--success), .15));*/
-    pointer-events   : none;
-    z-index          : -1;
+    background-color : var(--status);
     animation        : toastTimeOut var(--timeout) ease-out;
+    animation-fill-mode: both;
+    animation-direction: normal;
+    /*animation-fill-mode : ;*/
 }
 
-@keyframes toastTimeOut {
-    50% {
-        width : 100%;
-    }
-    100% {
-        width : 0;
-    }
+toast:hover:not(.hidden) > div.progress-bar::after {
+    animation-play-state: paused;
+    /*animation : toastTimePause var(--timeout) ease-out;*/
 }
-
 
 toast button.close {
     /*background-color : orangered;*/
@@ -163,5 +167,49 @@ toast:hover button {
 }
 
 toast button:hover {
-    color : hsla(var(--baseline-50));
+    color : hsla(var(--baseline-100));
+}
+
+@keyframes toastTimeOut {
+    25% {
+        width : 100%;
+    }
+    100% {
+        width   : 0;
+    }
+}
+
+@keyframes toastTimePause {
+    25% {
+        width   : 0;
+    }
+    100% {
+        width : 100%;
+    }
+}
+
+
+toast.success {
+    --status       : var(--success);
+    --status-light : var(--success-lighter);
+}
+
+toast.info {
+    --status       : var(--info);
+    --status-light : var(--info-lighter);
+}
+
+toast.notice {
+    --status       : var(--notice);
+    --status-light : var(--notice-lighter);
+}
+
+toast.warning {
+    --status       : var(--warning);
+    --status-light : var(--warning-lighter);
+}
+
+toast.error {
+    --status       : var(--danger);
+    --status-light : var(--danger-lighter);
 }
