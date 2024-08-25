@@ -46,6 +46,7 @@ final class Notification extends Component {
             'key'           => hashKey( $this->parameters ),
             'type'          => $this->parameters[ 'type' ],
             'icon'          => IconPack::get( $this->type, 'notice' ),
+            'timeout'       => $this->parameters[ 'timeout' ],
             'message'       => $this->parameters[ 'message' ],
             'description'   => $this->parameters[ 'description' ],
             'instances'     => $this->instances,
@@ -67,10 +68,9 @@ final class Notification extends Component {
         $this->attributes->class->add( "notification $type" );
 
         $this->parameters[ 'type' ]        = normalizeKey( $type );
-        $this->parameters[ 'message' ]     = \trim( $message );
+        $this->parameters[ 'message' ]     = $message ? \trim( $message ) : throw new \InvalidArgumentException( 'A message is required.' );
         $this->parameters[ 'description' ] = $description ? trim( $description ) : null;
         if ( $timeout ) {
-
             $this->attributes->set( 'timeout', ( $timeout < 3500 ) ? 3500 : $timeout );
         }
         $this->instances[] = new Time();
@@ -78,6 +78,11 @@ final class Notification extends Component {
 
     protected function render() : string {
         return $this->latte( __DIR__ . '/Notification/notification.latte' );
+    }
+
+    public function setTimeout( int $timeout ) : self {
+        $this->attributes->set( 'timeout', $timeout );
+        return $this;
     }
 
     static public function getAssets() : array {
