@@ -16,8 +16,8 @@ use Psr\Log\LoggerInterface;
 
 /**
  */
-final class ComponentRuntime
-{
+final class LatteRuntime {
+
     /**
      * @var array{non-empty-string: class-string}
      */
@@ -28,23 +28,22 @@ final class ComponentRuntime
         'menu'         => Menu::class,
     ];
 
-    public function __construct(
-        private readonly array $componentCallback = [],
-    ) {}
+    public function __construct( private readonly array $componentCallback = [] ) {}
 
     public function __call( string $name, array $arguments ) : ?HtmlStringable {
 
         // Retrieve the component classname, return null on failure
-        if ( !$component = $this->registeredComponent( $name ) ) {
+        if ( ! $component = $this->registeredComponent( $name ) ) {
             return null;
         }
 
         if ( \array_key_exists( $name, $this->componentCallback ) ) {
             $arguments = ( $this->componentCallback[ $name ] )( $arguments );
         }
-        $render = new ( $component )( ...$arguments );
 
-        if ( !$render instanceof HtmlStringable ) {
+        $render = ( $component )::runtimeRender( ...$arguments );
+
+        if ( ! $render instanceof HtmlStringable ) {
             Log::error(
                 'Unable to call the {name} component {component}, it does not implement the {interface}.',
                 [
@@ -60,9 +59,14 @@ final class ComponentRuntime
         // return $component;
     }
 
+    /**
+     * @param string $name
+     *
+     * @return false|class-string
+     */
     private function registeredComponent( string $name ) : false | string {
 
-        if ( !\array_key_exists( $name, self::COMPONENTS ) ) {
+        if ( ! \array_key_exists( $name, self::COMPONENTS ) ) {
             Log::notice(
                 'Call to undefined component {name}.',
                 [ 'name' => $name ],
@@ -70,12 +74,12 @@ final class ComponentRuntime
             return false;
         }
 
-        $component = ComponentRuntime::COMPONENTS[ $name ] ?? null;
+        $component = LatteRuntime::COMPONENTS[ $name ] ?? null;
 
-        if ( !\class_exists( $component ) ) {
+        if ( ! \class_exists( $component ) ) {
             Log::alert(
                 'Component {name} could not be rendered, the registered class {class} does not exist.',
-                [ 'name' => $name, 'class' => $component ],
+                [ 'name' => $name, 'class' => $component, ],
             );
             return false;
         }

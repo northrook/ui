@@ -11,6 +11,7 @@ use Northrook\UI\IconPack;
 use function Northrook\hashKey;
 use function Northrook\normalizeKey;
 
+
 /**
  *
  * @property-read string  $type          One of 'info', 'success', 'warning', 'danger', or 'notice'
@@ -27,9 +28,11 @@ use function Northrook\normalizeKey;
  *
  * @author Martin Nielsen <mn@northrook.com>
  */
-final class Notification extends Component {
+final class Notification extends Component
+{
 
     use PropertyAccessor;
+
 
     protected const ?string  TYPE = 'notification';
 
@@ -41,7 +44,30 @@ final class Notification extends Component {
         'timeout'     => null,
     ];
 
-    public function __get( string $property ) : null | string | int | array | HtmlStringable {
+    final public function __construct(
+        array   $attributes = [],
+        string  $type = 'notice',
+        ?string $message = null,
+        ?string $description = null,
+        ?int    $timeout = null,
+    )
+    {
+        parent::__construct( $attributes );
+
+        $this->attributes->add( 'class', "notification $type" );
+
+        $this->parameters[ 'type' ]        = normalizeKey( $type );
+        $this->parameters[ 'message' ]     =
+            $message ? \trim( $message ) : throw new \InvalidArgumentException( 'A message is required.' );
+        $this->parameters[ 'description' ] = $description ? trim( $description ) : null;
+        if ( $timeout ) {
+            $this->attributes->set( 'timeout', ( $timeout < 3500 ) ? 3500 : $timeout );
+        }
+        $this->instances[] = new Time();
+    }
+
+    public function __get( string $property ) : null | string | int | array | HtmlStringable
+    {
         return match ( $property ) {
             'key'           => hashKey( $this->parameters ),
             'type'          => $this->parameters[ 'type' ],
@@ -56,36 +82,38 @@ final class Notification extends Component {
         };
     }
 
-    final public function __construct(
-        array $attributes = [],
-        string $type = 'notice',
+    public static function runtimeRender(
+        array   $attributes = [],
+        string  $type = 'notice',
         ?string $message = null,
         ?string $description = null,
-        ?int $timeout = null,
-    ) {
-        parent::__construct( $attributes );
-
-        $this->attributes->class->add( "notification $type" );
-
-        $this->parameters[ 'type' ]        = normalizeKey( $type );
-        $this->parameters[ 'message' ]     = $message ? \trim( $message ) : throw new \InvalidArgumentException( 'A message is required.' );
-        $this->parameters[ 'description' ] = $description ? trim( $description ) : null;
-        if ( $timeout ) {
-            $this->attributes->set( 'timeout', ( $timeout < 3500 ) ? 3500 : $timeout );
+        ?int    $timeout = null,
+    ) : Notification
+    {
+        foreach ( $attributes as $variable => $value ) {
+            if ( \array_key_exists( $variable, \get_defined_vars() ) ) {
+                $$variable = $value;
+                unset( $attributes[ $variable ] );
+            }
         }
-        $this->instances[] = new Time();
+        unset( $variable, $value );
+
+        return new Notification( $attributes, $type, $message, $description, $timeout );
     }
 
-    protected function render() : string {
+    protected function render() : string
+    {
         return $this->latte( __DIR__ . '/Notification/notification.latte' );
     }
 
-    public function setTimeout( int $timeout ) : self {
+    public function setTimeout( int $timeout ) : self
+    {
         $this->attributes->set( 'timeout', $timeout );
         return $this;
     }
 
-    static public function getAssets() : array {
+    static public function getAssets() : array
+    {
         return [
             __DIR__ . '/Notification/notification.css',
             __DIR__ . '/Notification/notification.js',
@@ -99,11 +127,12 @@ final class Notification extends Component {
      *
      * @link https://www.php.net/manual/en/datetime.format.php#refsect1-datetime.format-parameters Formatting Documentation
      *
-     * @param string $format
+     * @param string  $format
      *
      * @return string
      */
-    public function timestamp( string $format = Time::FORMAT_HUMAN ) : string {
+    public function timestamp( string $format = Time::FORMAT_HUMAN ) : string
+    {
         return $this->getTimestamp()->format( $format );
     }
 
@@ -113,11 +142,13 @@ final class Notification extends Component {
      * @return Time
      * @internal
      */
-    private function getTimestamp() : Time {
+    private function getTimestamp() : Time
+    {
         return $this->instances[ \array_key_last( $this->instances ) ];
     }
 
-    private function timestampWhen() : string {
+    private function timestampWhen() : string
+    {
         $now       = time();
         $unix      = $this->getTimestamp()->unixTimestamp;
         $timestamp = $this->getTimestamp()->format( Time::FORMAT_HUMAN, true );
@@ -139,7 +170,8 @@ final class Notification extends Component {
      *
      * @return int
      */
-    public function count() : int {
+    public function count() : int
+    {
         return count( $this->instances );
     }
 

@@ -9,26 +9,29 @@ use Latte\Runtime\HtmlStringable;
 use Northrook\HTML\Element\Attributes;
 use Northrook\Latte;
 use Northrook\UI\AssetHandler;
+use Northrook\UI\Latte\RuntimeRenderInterface;
 use function Northrook\classBasename;
 use function Northrook\hashKey;
 
-abstract class Component implements HtmlStringable, ComponentInterface
+
+abstract class Component implements RuntimeRenderInterface
 {
+
     /**
      * @var ?string Manually set the Component Type - will be derived from ClassName otherwise
      */
     protected const ?string TYPE = null;
-    protected readonly string $templateType;
-    protected readonly string $templatePath;
-
     public readonly Attributes $attributes;
+    protected readonly string  $templateType;
+    protected readonly string  $templatePath;
 
     /**
      * @param array  $attributes
      */
     public function __construct(
         array $attributes = [],
-    ) {
+    )
+    {
         $this->attributes   = new Attributes( $attributes );
         $this->templateType = \strtolower( $this::TYPE ?? classBasename( $this::class ) );
     }
@@ -45,16 +48,19 @@ abstract class Component implements HtmlStringable, ComponentInterface
      */
     abstract static public function getAssets() : array;
 
-    final public function attr( mixed ...$inject ) : ?HtmlStringable {
+    final public function attr( mixed ...$inject ) : ?HtmlStringable
+    {
         return new Html( \implode( ' ', $this->attributes->merge( $inject )->toArray() ) );
     }
 
-    function __toString() : string {
+    public function __toString() : string
+    {
         AssetHandler::register( $this->templateType, $this::class );
         return $this->render();
     }
 
-    final protected function latte( string $template, array $attributes = [] ) : string {
+    final protected function latte( string $template, array $attributes = [] ) : string
+    {
         return Latte::render(
             template       : $template,
             parameters     : [ $this->templateType => $this ] + $attributes,
@@ -62,7 +68,8 @@ abstract class Component implements HtmlStringable, ComponentInterface
         );
     }
 
-    final protected function uniqueTemplateId() : string {
+    final protected function uniqueTemplateId() : string
+    {
         return hashKey( [ $this, \spl_object_id( $this ) ] );
     }
 }

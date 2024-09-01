@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace Northrook\UI\Latte;
+namespace Northrook\UI\Latte\Extension;
 
 use Latte\Compiler\Node;
 use Latte\Compiler\Nodes\AuxiliaryNode;
@@ -13,19 +13,21 @@ use Latte\Compiler\PrintContext;
 use Northrook\Latte\Compiler\CompilerPassExtension;
 use Northrook\UI\Compiler\NodeCompilerTrait;
 use Northrook\UI\IconPack;
+use Northrook\UI\Latte\LatteRuntime;
+
 
 final class ComponentExtension extends CompilerPassExtension
 {
     use NodeCompilerTrait;
 
-    public readonly IconPack         $iconPack;
-    public readonly ComponentRuntime $componentRuntime;
+    public readonly IconPack     $iconPack;
+    public readonly LatteRuntime $componentRuntime;
 
     public function __construct(
-        ?ComponentRuntime $componentRuntime = null,
-        ?IconPack         $iconPack = null,
+        ?LatteRuntime $componentRuntime = null,
+        ?IconPack     $iconPack = null,
     ) {
-        $this->componentRuntime = $componentRuntime ?? new ComponentRuntime();
+        $this->componentRuntime = $componentRuntime ?? new LatteRuntime();
         $this->iconPack         = $iconPack ?? new IconPack();
         // dump( $this);
     }

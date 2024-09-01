@@ -18,7 +18,8 @@
   "prefer-stable": true,
   "require": {
     "php": ">=8.3",
-    "northrook/latte-bundle": "dev-main"
+    "northrook/latte-bundle": "dev-main",
+    "voku/portable-ascii": "^2.0"
   },
   "require-dev": {
     "phpstan/phpstan": "@stable",

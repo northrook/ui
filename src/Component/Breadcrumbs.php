@@ -17,13 +17,13 @@ use function Northrook\normalizePath;
  * @link https://www.aditus.io/patterns/breadcrumbs
  * @link https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/examples/breadcrumb
  */
-class Breadcrumbs extends Component
-{
+class Breadcrumbs extends Component {
+
     protected const string   SCHEMA = 'RDFa';
     protected const ?string  TYPE   = 'breadcrumbs';
 
     final public function __construct(
-        array                          $attributes = [],
+        array $attributes = [],
         private readonly array | Trail $breadcrumbs = [],
     ) {
         parent::__construct( $attributes );
@@ -32,6 +32,10 @@ class Breadcrumbs extends Component
 
     protected function render() : string {
         return $this->latte( __DIR__ . '/Breadcrumbs/breadcrumbs.latte' );
+    }
+
+    public static function runtimeRender( array $attributes = [], array | Trail $breadcrumbs = [] ) : Breadcrumbs {
+        return new self( $attributes, $breadcrumbs );
     }
 
     final protected function getBreadcrumbTrail() : array {

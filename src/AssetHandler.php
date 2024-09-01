@@ -5,7 +5,7 @@ namespace Northrook\UI;
 use Northrook\Asset\Script;
 use Northrook\Asset\Style;
 use Northrook\Resource\Path;
-use Northrook\UI\Latte\ComponentRuntime;
+use Northrook\UI\Latte\LatteRuntime;
 use function Northrook\normalizePath;
 
 final class AssetHandler
