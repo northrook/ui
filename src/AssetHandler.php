@@ -5,7 +5,7 @@ namespace Northrook\UI;
 use Northrook\Asset\Script;
 use Northrook\Asset\Style;
 use Northrook\Resource\Path;
-use Northrook\UI\Latte\LatteRuntime;
+use Northrook\UI\Latte\RenderRuntime;
 use function Northrook\normalizePath;
 
 final class AssetHandler
@@ -40,10 +40,14 @@ final class AssetHandler
 
         $assets = [];
 
-        foreach ( $this::$calledComponents as $component => $className ) {
+        foreach ( RenderRuntime::getCalledInvocations() as $className => $component ) {
+
+            if ( !\method_exists( $className, 'getAssets' ) ) {
+                continue;
+            }
 
             // Do not get assets for these components
-            if ( \in_array( $component, $filter, false ) ) {
+            if ( \in_array( $className, $filter, false ) ) {
                 continue;
             }
 

@@ -10,11 +10,12 @@ final readonly class Item
     public string  $title;
     public ?string $href;
     public ?string $type;
+    public ?string $classes;
 
     public function __construct(
         string         $title,
         ?string        $href = null,
-        public array   $classes = [],
+        array   $classes = [],
         public ?string $icon = null,
         public ?int    $position = null,
         public bool    $current = false,
@@ -23,5 +24,6 @@ final readonly class Item
         $this->title = filterHtmlText( $title );
         $this->href  = $href ? filterUrl( $href ) : null;
         $this->type  = $this->href ? "WebPage" : null;
+        $this->classes = implode( ' ', $classes );
     }
 }

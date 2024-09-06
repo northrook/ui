@@ -2,12 +2,17 @@
 
 namespace Northrook\UI\Component;
 
+use Latte\Compiler\Node;
+use Latte\Compiler\Nodes\AuxiliaryNode;
 use Latte\Runtime\Html;
 use Latte\Runtime\HtmlStringable;
+use Northrook\Logger\Log;
 use Northrook\Time;
 use Northrook\Trait\PropertyAccessor;
 use Northrook\UI\Compiler\Component;
+use Northrook\UI\Compiler\NodeCompiler;
 use Northrook\UI\IconPack;
+use Northrook\UI\Latte\RenderRuntime;
 use function Northrook\hashKey;
 use function Northrook\normalizeKey;
 
@@ -30,7 +35,6 @@ use function Northrook\normalizeKey;
  */
 final class Notification extends Component
 {
-
     use PropertyAccessor;
 
 
@@ -45,11 +49,11 @@ final class Notification extends Component
     ];
 
     final public function __construct(
-        array   $attributes = [],
-        string  $type = 'notice',
-        ?string $message = null,
-        ?string $description = null,
-        ?int    $timeout = null,
+        array               $attributes = [],
+        string              $type = 'notice',
+        ?string             $message = null,
+        ?string             $description = null,
+        null | int | string $timeout = null,
     )
     {
         parent::__construct( $attributes );
@@ -61,8 +65,13 @@ final class Notification extends Component
             $message ? \trim( $message ) : throw new \InvalidArgumentException( 'A message is required.' );
         $this->parameters[ 'description' ] = $description ? trim( $description ) : null;
         if ( $timeout ) {
+            // TODO : Expand this in core\functions
+            if ( !\is_numeric( $timeout ) ) {
+                $timeout = ( \strtotime( $timeout, 0 ) ) * 100;
+            }
             $this->attributes->set( 'timeout', ( $timeout < 3500 ) ? 3500 : $timeout );
         }
+
         $this->instances[] = new Time();
     }
 
@@ -80,25 +89,6 @@ final class Notification extends Component
             'unixTimestamp' => $this->getTimestamp()->unixTimestamp,
             'when'          => new Html( $this->timestampWhen() ),
         };
-    }
-
-    public static function runtimeRender(
-        array   $attributes = [],
-        string  $type = 'notice',
-        ?string $message = null,
-        ?string $description = null,
-        ?int    $timeout = null,
-    ) : Notification
-    {
-        foreach ( $attributes as $variable => $value ) {
-            if ( \array_key_exists( $variable, \get_defined_vars() ) ) {
-                $$variable = $value;
-                unset( $attributes[ $variable ] );
-            }
-        }
-        unset( $variable, $value );
-
-        return new Notification( $attributes, $type, $message, $description, $timeout );
     }
 
     protected function render() : string
@@ -175,4 +165,57 @@ final class Notification extends Component
         return count( $this->instances );
     }
 
+    public static function nodeCompiler( Node $node ) : AuxiliaryNode
+    {
+        $node = new NodeCompiler( $node );
+        [ $attributes, $variables ] = $node->resolveComponentArguments();
+        dump( $attributes, $variables );
+        return RenderRuntime::auxiliaryNode(
+            Notification::class,
+            [
+                $attributes,
+                $variables,
+            ],
+        );
+    }
+
+    public static function runtimeRender( array $attributes = [], array $variables = [] ) : string
+    {
+        $arguments = [
+            'type'        => null,
+            'message'     => null,
+            'description' => null,
+            'timeout'     => null,
+
+        ];
+        foreach ( $attributes as $variable => $value ) {
+            if ( \array_key_exists( $variable, $arguments ) ) {
+                $arguments[ $variable ] = $value;
+                unset( $attributes[ $variable ] );
+            }
+        }
+        // unset( $variable, $value );
+        Log::critical( print_r( $attributes, true ) );
+        Log::critical( print_r( $arguments, true ) );
+
+        return (string) new Notification( $attributes, ... $arguments );
+    }
 }
+// public static function runtimeRender(
+//     array   $attributes = [],
+//     string  $type = 'notice',
+//     ?string $message = null,
+//     ?string $description = null,
+//     ?int    $timeout = null,
+// ) : Notification
+// {
+//     foreach ( $attributes as $variable => $value ) {
+//         if ( \array_key_exists( $variable, \get_defined_vars() ) ) {
+//             $$variable = $value;
+//             unset( $attributes[ $variable ] );
+//         }
+//     }
+//     unset( $variable, $value );
+//
+//     return new Notification( $attributes, $type, $message, $description, $timeout );
+// }

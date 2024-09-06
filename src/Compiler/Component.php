@@ -8,14 +8,19 @@ use Latte\Runtime\Html;
 use Latte\Runtime\HtmlStringable;
 use Northrook\HTML\Element\Attributes;
 use Northrook\Latte;
-use Northrook\UI\AssetHandler;
 use Northrook\UI\Latte\RuntimeRenderInterface;
 use function Northrook\classBasename;
 use function Northrook\hashKey;
 
 
+/**
+ *
+ * @author Martin Nielsen <mn@northrook.com>
+ */
 abstract class Component implements RuntimeRenderInterface
 {
+    use NodeCompilerMethods;
+
 
     /**
      * @var ?string Manually set the Component Type - will be derived from ClassName otherwise
@@ -23,7 +28,6 @@ abstract class Component implements RuntimeRenderInterface
     protected const ?string TYPE = null;
     public readonly Attributes $attributes;
     protected readonly string  $templateType;
-    protected readonly string  $templatePath;
 
     /**
      * @param array  $attributes
@@ -41,13 +45,6 @@ abstract class Component implements RuntimeRenderInterface
      */
     abstract protected function render() : string;
 
-    /**
-     * Returns an array of all CSS and JS assets.
-     *
-     * @return string[]
-     */
-    abstract static public function getAssets() : array;
-
     final public function attr( mixed ...$inject ) : ?HtmlStringable
     {
         return new Html( \implode( ' ', $this->attributes->merge( $inject )->toArray() ) );
@@ -55,7 +52,6 @@ abstract class Component implements RuntimeRenderInterface
 
     public function __toString() : string
     {
-        AssetHandler::register( $this->templateType, $this::class );
         return $this->render();
     }
 
@@ -72,4 +68,11 @@ abstract class Component implements RuntimeRenderInterface
     {
         return hashKey( [ $this, \spl_object_id( $this ) ] );
     }
+
+    /**
+     * Returns an array of all CSS and JS assets.
+     *
+     * @return string[]
+     */
+    abstract static public function getAssets() : array;
 }
