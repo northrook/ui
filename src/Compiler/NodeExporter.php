@@ -4,6 +4,8 @@ declare( strict_types = 1 );
 
 namespace Northrook\UI\Compiler;
 
+use PHPStan\Reflection\Dummy\DummyConstantReflection;
+use PHPStan\Rules\Functions\CallCallablesRule;
 use Symfony\Component\VarExporter\VarExporter;
 use function Northrook\stringStartsWith;
 use const Northrook\EMPTY_STRING;
@@ -78,7 +80,6 @@ final class NodeExporter
         return $this;
     }
 
-
     private function handleArgument( mixed $argument ) : string
     {
         if ( \is_string( $argument ) || $argument instanceof \Stringable ) {
@@ -111,11 +112,10 @@ final class NodeExporter
             $export[] = $argument;
         }
 
-        $string = implode( ', ' . PHP_EOL, $export ) . PHP_EOL;
+        $string = \implode( ', ' . PHP_EOL, $export ) . PHP_EOL;
 
         return "[ $string ]";
     }
-
 
     public static function string( string $value ) : string
     {
@@ -126,7 +126,6 @@ final class NodeExporter
         }
         return $value;
     }
-
 
     public static function array( array $array ) : string
     {
@@ -159,5 +158,23 @@ final class NodeExporter
     public static function boolean( bool $bool ) : string
     {
         return $bool ? 'true' : 'false';
+    }
+
+    public static function integer( ?int $int ) : string
+    {
+        return $int === null ? 'null' : (string) $int;
+    }
+
+    public static function cacheConstant( ?int $cache ) : string
+    {
+        static $runtimeCache;
+        $runtimeCache[ 'constants' ] ??= \array_filter(
+            \get_defined_constants( true )[ 'user' ],
+            static fn( $key ) => \str_starts_with( $key, "Cache" ),
+            ARRAY_FILTER_USE_KEY,
+        );
+
+        return (string) $runtimeCache[ $cache ]
+            ??= \array_search( $cache, $runtimeCache[ 'constants' ], true ) ?: $cache;
     }
 }

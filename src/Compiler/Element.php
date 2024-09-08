@@ -7,6 +7,7 @@ namespace Northrook\UI\Compiler;
 use Latte\Compiler\Node;
 use Latte\Compiler\Nodes\Html\ElementNode;
 use Northrook\HTML\AbstractElement;
+use Northrook\UI\Latte\RenderRuntime;
 use Northrook\UI\Latte\RuntimeRenderInterface;
 
 
@@ -19,4 +20,11 @@ abstract class Element
     implements RuntimeRenderInterface
 {
     use NodeCompilerMethods;
+
+
+    final public function __toString() : string
+    {
+        RenderRuntime::registerInvocation( $this::class );
+        return parent::__toString();
+    }
 }

@@ -11,12 +11,17 @@ use Latte\Compiler\Nodes\Html\ElementNode;
 use Latte\Compiler\Nodes\Php\ExpressionNode;
 use Latte\Compiler\Nodes\TemplateNode;
 use Latte\Compiler\NodeTraverser;
+use Latte\Engine;
 use Northrook\UI\Compiler\NodeCompilerMethods;
 use Northrook\UI\Component\Breadcrumbs;
 use Northrook\UI\Component\Notification;
+use Northrook\UI\Element\Anchor;
+use Northrook\UI\Element\Button;
 use Northrook\UI\Element\Heading;
+use Northrook\UI\Element\Image;
 use Northrook\UI\IconPack;
 use Northrook\UI\Latte\RenderRuntime;
+use PHPStan\Reflection\Dummy\DummyConstantReflection;
 use Symfony\Contracts\Cache\CacheInterface;
 
 
@@ -41,10 +46,8 @@ final class RenderExtension extends Latte\Extension
     public function getPasses() : array
     {
         return [
-            $this::class => function( TemplateNode $templateNode ) : void
-            {
-                ( new NodeTraverser() )->traverse( $templateNode, [ $this, 'parseTemplate' ] );
-            },
+            $this::class => fn( TemplateNode $templateNode ) => (
+            new NodeTraverser() )->traverse( $templateNode, [ $this, 'parseTemplate', ] ),
         ];
     }
 
@@ -65,8 +68,11 @@ final class RenderExtension extends Latte\Extension
     private function element( Node $node ) : ?AuxiliaryNode
     {
         return match ( true ) {
-            $this::isHeading( $node ) => Heading::nodeCompiler( $node ),
-            default                   => null
+            $this::isHeading( $node )           => Heading::nodeCompiler( $node ),
+            $this::isImage( $node )             => Image::nodeCompiler( $node ),
+            // $this::isElement( $node, 'a' )      => Anchor::nodeCompiler( $node ),
+            $this::isElement( $node, 'button' ) => Button::nodeCompiler( $node ),
+            default                             => null
         };
     }
 

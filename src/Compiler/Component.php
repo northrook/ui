@@ -8,6 +8,7 @@ use Latte\Runtime\Html;
 use Latte\Runtime\HtmlStringable;
 use Northrook\HTML\Element\Attributes;
 use Northrook\Latte;
+use Northrook\UI\Latte\RenderRuntime;
 use Northrook\UI\Latte\RuntimeRenderInterface;
 use function Northrook\classBasename;
 use function Northrook\hashKey;
@@ -50,8 +51,9 @@ abstract class Component implements RuntimeRenderInterface
         return new Html( \implode( ' ', $this->attributes->merge( $inject )->toArray() ) );
     }
 
-    public function __toString() : string
+    final public function __toString() : string
     {
+        RenderRuntime::registerInvocation( $this::class );
         return $this->render();
     }
 

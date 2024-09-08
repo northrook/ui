@@ -9,7 +9,7 @@ use Northrook\UI\Compiler\Element;
 use Northrook\UI\Compiler\NodeCompiler;
 
 
-class Anchor extends Element
+class Button extends Element
 {
 
     public static function nodeCompiler( Node $node ) : AuxiliaryNode

@@ -26,6 +26,29 @@ trait NodeCompilerMethods
      *
      * @return bool
      */
+    protected static function isImage( string | Node $element ) : bool
+    {
+        if ( $element instanceof Node ) {
+            if ( $element instanceof ElementNode ) {
+                $element = $element->name;
+            }
+            else {
+                return false;
+            }
+        }
+
+        return \in_array( \strtolower( $element ), [ 'img', 'picture' ], true );
+    }
+
+    /**
+     * Check if the provided string is considered a {@see Tag::HEADING}.
+     *
+     * - Case-insensitive
+     *
+     * @param string | Node  $element
+     *
+     * @return bool
+     */
     protected static function isHeading( string | Node $element ) : bool
     {
         if ( $element instanceof Node ) {
@@ -38,6 +61,25 @@ trait NodeCompilerMethods
         }
 
         return \in_array( \strtolower( $element ), Tag::HEADING, true );
+    }
+
+    /**
+     * Check if the provided string is considered a {@see Tag::HEADING}.
+     *
+     * - Case-insensitive
+     *
+     * @param Node    $node
+     * @param string  $tag
+     *
+     * @return bool
+     */
+    protected static function isElement( Node $node, string $tag ) : bool
+    {
+        if ( !$node instanceof ElementNode ) {
+            return false;
+        }
+
+        return $node->name === $tag;
     }
 
     /**

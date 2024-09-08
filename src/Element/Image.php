@@ -4,12 +4,13 @@ namespace Northrook\UI\Element;
 
 use Latte\Compiler\Node;
 use Latte\Compiler\Nodes\AuxiliaryNode;
+use Latte\Compiler\PrintContext;
 use Northrook\Minify;
 use Northrook\UI\Compiler\Element;
 use Northrook\UI\Compiler\NodeCompiler;
 
 
-class Anchor extends Element
+class Image extends Element
 {
 
     public static function nodeCompiler( Node $node ) : AuxiliaryNode

@@ -15,6 +15,7 @@ use Northrook\UI\IconPack;
 use Northrook\UI\Latte\RenderRuntime;
 use function Northrook\hashKey;
 use function Northrook\normalizeKey;
+use const Cache\DISABLED;
 
 
 /**
@@ -167,15 +168,10 @@ final class Notification extends Component
 
     public static function nodeCompiler( Node $node ) : AuxiliaryNode
     {
-        $node = new NodeCompiler( $node );
-        [ $attributes, $variables ] = $node->resolveComponentArguments();
-        dump( $attributes, $variables );
         return RenderRuntime::auxiliaryNode(
-            Notification::class,
-            [
-                $attributes,
-                $variables,
-            ],
+            renderName : Notification::class,
+            arguments  : NodeCompiler::getComponentArguments( $node ),
+            cache      : DISABLED,
         );
     }
 
@@ -194,28 +190,7 @@ final class Notification extends Component
                 unset( $attributes[ $variable ] );
             }
         }
-        // unset( $variable, $value );
-        Log::critical( print_r( $attributes, true ) );
-        Log::critical( print_r( $arguments, true ) );
 
         return (string) new Notification( $attributes, ... $arguments );
     }
 }
-// public static function runtimeRender(
-//     array   $attributes = [],
-//     string  $type = 'notice',
-//     ?string $message = null,
-//     ?string $description = null,
-//     ?int    $timeout = null,
-// ) : Notification
-// {
-//     foreach ( $attributes as $variable => $value ) {
-//         if ( \array_key_exists( $variable, \get_defined_vars() ) ) {
-//             $$variable = $value;
-//             unset( $attributes[ $variable ] );
-//         }
-//     }
-//     unset( $variable, $value );
-//
-//     return new Notification( $attributes, $type, $message, $description, $timeout );
-// }

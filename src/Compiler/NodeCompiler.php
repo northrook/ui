@@ -140,6 +140,11 @@ class NodeCompiler
 
     // :: END NODE
 
+    public static function getComponentArguments( Node $node) : array
+    {
+        return ( new NodeCompiler( $node))->resolveComponentArguments();
+    }
+
     final public function resolveComponentArguments( ?ElementNode $node = null ) : array
     {
         $node ??= $this->node;

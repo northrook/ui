@@ -5,11 +5,14 @@ declare( strict_types = 1 );
 namespace Northrook\UI\Latte;
 
 use Latte\Compiler\Nodes\AuxiliaryNode;
+use Northrook\Minify;
 use Northrook\UI\Compiler\NodeExporter;
 use Northrook\Logger\Log;
 use Psr\Cache\InvalidArgumentException;
+use Symfony\Component\Cache\CacheItem;
 use Symfony\Contracts\Cache\CacheInterface;
 use function Northrook\{classBasename, hashKey, normalizeKey};
+use const Cache\{AUTO, DISABLED, EPHEMERAL};
 
 
 /**
@@ -48,14 +51,14 @@ final class RenderRuntime
     public static function auxiliaryNode(
         string $renderName,
         array  $arguments = [],
-        bool   $cache = true,
+        ?int   $cache = AUTO,
     ) : AuxiliaryNode
     {
         return new AuxiliaryNode(
             static fn() : string => 'echo $this->global->render->__invoke(
                 className: ' . NodeExporter::string( $renderName ) . ',
                 arguments: ' . NodeExporter::arguments( $arguments ) . ',
-                cache    : ' . NodeExporter::boolean( $cache ) . '
+                cache    : ' . NodeExporter::cacheConstant( $cache ) . '
              );',
         );
     }
@@ -63,25 +66,31 @@ final class RenderRuntime
     public function __invoke(
         string $className,
         array  $arguments = [],
-        bool   $cache = true,
+        ?int   $cache = AUTO,
     ) : ?string
     {
         if ( !$this->validate( $className ) ) {
             return null;
         }
 
-        $this->registerInvocation( $className );
+        $this::registerInvocation( $className );
 
         $arguments = $this->invokedArguments( $className, $arguments );
 
-        if ( !$cache || !$this->cache ) {
+        if ( $cache === EPHEMERAL || $cache === DISABLED || !$this->cache ) {
             return [ $className, $this::METHOD ]( ...$arguments );
         }
 
         try {
             return $this->cache->get(
                 normalizeKey( [ $className, hashKey( $arguments ) ], '.' ),
-                fn() => [ $className, $this::METHOD ]( ...$arguments ),
+                function( CacheItem $item ) use ( $className, $arguments, $cache ) : string
+                {
+                    $item->expiresAfter( $cache );
+                    $string = [ $className, $this::METHOD ]( ...$arguments );
+
+                    return Minify::HTML( $string );
+                },
             );
         }
         catch ( InvalidArgumentException $exception ) {
@@ -123,7 +132,7 @@ final class RenderRuntime
         return RenderRuntime::$called;
     }
 
-    private function registerInvocation( string $className ) : void
+    public static function registerInvocation( string $className ) : void
     {
         if ( isset( RenderRuntime::$called[ $className ] ) ) {
             return;

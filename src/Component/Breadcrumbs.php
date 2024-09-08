@@ -28,8 +28,8 @@ class Breadcrumbs extends Component
         private readonly array | Trail $breadcrumbs = [],
     )
     {
-        parent::__construct( $attributes )
-            ->attributes->add( 'class', 'breadcrumbs' );
+        parent::__construct( $attributes );
+        $this->attributes->add( 'class', 'breadcrumbs' );
     }
 
     protected function render() : string
@@ -62,18 +62,13 @@ class Breadcrumbs extends Component
 
     public static function nodeCompiler( Node $node ) : AuxiliaryNode
     {
-        $node = new NodeCompiler( $node );
-        [ $attributes, $variables ] = $node->resolveComponentArguments();
         return RenderRuntime::auxiliaryNode(
-            Breadcrumbs::class,
-            [
-                $attributes,
-                $variables,
-            ],
+            renderName : Breadcrumbs::class,
+            arguments  : NodeCompiler::getComponentArguments( $node ),
         );
     }
 
-    public static function runtimeRender( array $attributes = [], array | Trail $breadcrumbs = [] ) : string
+    public static function runtimeRender( array $attributes = [], array $breadcrumbs = [] ) : string
     {
         return (string) new self( $attributes, ...$breadcrumbs );
     }
