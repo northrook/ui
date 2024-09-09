@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace Northrook\UI\Latte\Extension;
+namespace Northrook\UI\Compiler\Latte;
 
 use Latte;
 use Latte\Compiler\Node;
@@ -11,21 +11,21 @@ use Latte\Compiler\Nodes\Html\ElementNode;
 use Latte\Compiler\Nodes\Php\ExpressionNode;
 use Latte\Compiler\Nodes\TemplateNode;
 use Latte\Compiler\NodeTraverser;
-use Latte\Engine;
+use Northrook\HTML\Element\Tag;
 use Northrook\UI\Compiler\NodeCompilerMethods;
 use Northrook\UI\Component\Breadcrumbs;
 use Northrook\UI\Component\Notification;
-use Northrook\UI\Element\Anchor;
 use Northrook\UI\Element\Button;
+use Northrook\UI\Element\Code;
 use Northrook\UI\Element\Heading;
 use Northrook\UI\Element\Image;
 use Northrook\UI\IconPack;
-use Northrook\UI\Latte\RenderRuntime;
-use PHPStan\Reflection\Dummy\DummyConstantReflection;
+use Northrook\UI\Node\Anchor;
+use Northrook\UI\RenderRuntime;
 use Symfony\Contracts\Cache\CacheInterface;
 
 
-final class RenderExtension extends Latte\Extension
+final class UiCompileExtension extends Latte\Extension
 {
     use NodeCompilerMethods;
 
@@ -57,40 +57,28 @@ final class RenderExtension extends Latte\Extension
             return NodeTraverser::DontTraverseChildren;
         }
 
-        return $this->element( $node ) ?? $this->component( $node ) ?? $node;
-    }
+        if ( !$node instanceof ElementNode ) {
+            return $node;
+        }
 
-    /**
-     * @param Node  $node
-     *
-     * @return ?AuxiliaryNode
-     */
-    private function element( Node $node ) : ?AuxiliaryNode
-    {
-        return match ( true ) {
+        $parsed = match ( true ) {
             $this::isHeading( $node )           => Heading::nodeCompiler( $node ),
             $this::isImage( $node )             => Image::nodeCompiler( $node ),
-            // $this::isElement( $node, 'a' )      => Anchor::nodeCompiler( $node ),
+            $this::isElement( $node, 'a' )      => Anchor::nodeCompiler( $node ),
             $this::isElement( $node, 'button' ) => Button::nodeCompiler( $node ),
+            $this::isElement( $node, 'code' )   => Code::nodeCompiler( $node ),
             default                             => null
+        };
+
+        return $parsed ?? match ( $node->name ) {
+            'ui:breadcrumbs'              => Breadcrumbs::nodeCompiler( $node ),
+            'ui:notification', 'ui:toast' => Notification::nodeCompiler( $node ),
+            default                       => $node
         };
     }
 
-    /**
-     * @param Node  $node
-     *
-     * @return ?AuxiliaryNode
-     */
-    private function component( Node $node ) : ?AuxiliaryNode
-    {
-        return $node instanceof ElementNode ? match ( $node->name ) {
-            'ui:breadcrumbs'              => Breadcrumbs::nodeCompiler( $node ),
-            'ui:notification', 'ui:toast' => Notification::nodeCompiler( $node ),
-            default                       => null
-        } : null;
-    }
-
-    public function getProviders() : array
+    public
+    function getProviders() : array
     {
         return [
             'render' => $this->runtime,

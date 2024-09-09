@@ -8,8 +8,8 @@ use Latte\Runtime\Html;
 use Latte\Runtime\HtmlStringable;
 use Northrook\HTML\Element\Attributes;
 use Northrook\Latte;
-use Northrook\UI\Latte\RenderRuntime;
-use Northrook\UI\Latte\RuntimeRenderInterface;
+use Northrook\UI\Compiler\Latte\RuntimeRenderInterface;
+use Northrook\UI\RenderRuntime;
 use function Northrook\classBasename;
 use function Northrook\hashKey;
 

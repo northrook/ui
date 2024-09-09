@@ -64,41 +64,36 @@ trait NodeCompilerMethods
     }
 
     /**
-     * Check if the provided string is considered a {@see Tag::HEADING}.
+     * Check if the provided {@see Node} is a valid {@see ElementNode}.
      *
      * - Case-insensitive
+     * - Will match namespaced tags by default
      *
-     * @param Node    $node
-     * @param string  $tag
+     * @param Node     $node
+     * @param ?string  $tag
+     * @param bool     $strict
      *
      * @return bool
      */
-    protected static function isElement( Node $node, string $tag ) : bool
+    protected static function isElement( Node $node, ?string $tag = null, bool $strict = false ) : bool
     {
         if ( !$node instanceof ElementNode ) {
             return false;
         }
 
-        return $node->name === $tag;
-    }
-
-    /**
-     * Check if the provided string is considered a {@see Tag::HEADING}.
-     *
-     * - Case-insensitive
-     *
-     * @param Node    $node
-     * @param string  $name
-     *
-     * @return bool
-     */
-    protected static function isComponent( Node $node, string $name ) : bool
-    {
-        if ( !$node instanceof ElementNode ) {
-            return false;
+        if ( !$tag ) {
+            return true;
         }
 
-        return $node->name === $name;
+        $nodeTag = \strtolower( $node->name );
+        $tag     = \strtolower( $tag );
+
+        if ( $strict === true || !\str_contains( $nodeTag, ':' ) ) {
+            return $nodeTag === $tag;
+        }
+        // dump( "$nodeTag : $tag", \str_starts_with( $nodeTag, $tag ) );
+
+        return \str_starts_with( $nodeTag, $tag );
     }
 
     protected static function stringifyCodeContent( ElementNode | TextNode | PrintNode $node ) : ?string

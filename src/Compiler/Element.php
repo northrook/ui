@@ -4,11 +4,9 @@ declare( strict_types = 1 );
 
 namespace Northrook\UI\Compiler;
 
-use Latte\Compiler\Node;
-use Latte\Compiler\Nodes\Html\ElementNode;
 use Northrook\HTML\AbstractElement;
-use Northrook\UI\Latte\RenderRuntime;
-use Northrook\UI\Latte\RuntimeRenderInterface;
+use Northrook\UI\Compiler\Latte\NodeCompilerInterface;
+use Northrook\UI\RenderRuntime;
 
 
 /**
@@ -17,7 +15,7 @@ use Northrook\UI\Latte\RuntimeRenderInterface;
  */
 abstract class Element
     extends AbstractElement
-    implements RuntimeRenderInterface
+    implements NodeCompilerInterface
 {
     use NodeCompilerMethods;
 

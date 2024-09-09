@@ -2,10 +2,8 @@
 
 declare( strict_types = 1 );
 
-namespace Northrook\UI\Latte;
+namespace Northrook\UI\Compiler\Latte;
 
-use Latte\Compiler\Node;
-use Latte\Compiler\Nodes\AuxiliaryNode;
 use Latte\Runtime\HtmlStringable;
 
 
@@ -13,16 +11,8 @@ use Latte\Runtime\HtmlStringable;
  * @internal
  * @author Martin Nielsen <mn@northrook.com>
  */
-interface RuntimeRenderInterface extends HtmlStringable
+interface RuntimeRenderInterface extends HtmlStringable, NodeCompilerInterface
 {
-
-    /**
-     *
-     * @param Node  $node
-     *
-     * @return Node
-     */
-    public static function nodeCompiler( Node $node ) : AuxiliaryNode;
 
     /**
      *

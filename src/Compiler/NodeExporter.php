@@ -4,12 +4,9 @@ declare( strict_types = 1 );
 
 namespace Northrook\UI\Compiler;
 
-use PHPStan\Reflection\Dummy\DummyConstantReflection;
-use PHPStan\Rules\Functions\CallCallablesRule;
 use Symfony\Component\VarExporter\VarExporter;
 use function Northrook\stringStartsWith;
-use const Northrook\EMPTY_STRING;
-use const Northrook\WHITESPACE;
+use const Northrook\{EMPTY_STRING, WHITESPACE};
 
 
 final class NodeExporter
@@ -108,6 +105,7 @@ final class NodeExporter
             $argument .= match ( \gettype( $value ) ) {
                 'string' => self::string( $value ),
                 'array'  => self::array( $value ),
+                'NULL' => self::string( 'null' ),
             };
             $export[] = $argument;
         }

@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace Northrook\UI\Latte;
+namespace Northrook\UI;
 
+use Psr\Cache\InvalidArgumentException;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Component\Cache\CacheItem;
 use Latte\Compiler\Nodes\AuxiliaryNode;
-use Northrook\Minify;
 use Northrook\UI\Compiler\NodeExporter;
 use Northrook\Logger\Log;
-use Psr\Cache\InvalidArgumentException;
-use Symfony\Component\Cache\CacheItem;
-use Symfony\Contracts\Cache\CacheInterface;
+use Northrook\Minify;
 use function Northrook\{classBasename, hashKey, normalizeKey};
 use const Cache\{AUTO, DISABLED, EPHEMERAL};
 

@@ -4,10 +4,11 @@ namespace Northrook\UI\Component;
 
 use Latte\Compiler\Node;
 use Latte\Compiler\Nodes\AuxiliaryNode;
+use Latte\Compiler\Nodes\Html\ElementNode;
 use Northrook\UI\Compiler\Component;
 use Northrook\UI\Compiler\NodeCompiler;
 use Northrook\UI\Component\Breadcrumbs\Trail;
-use Northrook\UI\Latte\RenderRuntime;
+use Northrook\UI\RenderRuntime;
 
 
 /**
@@ -60,7 +61,7 @@ class Breadcrumbs extends Component
         ];
     }
 
-    public static function nodeCompiler( Node $node ) : AuxiliaryNode
+    public static function nodeCompiler( ElementNode $node ) : AuxiliaryNode
     {
         return RenderRuntime::auxiliaryNode(
             renderName : Breadcrumbs::class,

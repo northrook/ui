@@ -2,24 +2,14 @@
 
 namespace Northrook\UI\Element;
 
-use JetBrains\PhpStorm\Deprecated;
 use Latte\Compiler\Node;
 use Latte\Compiler\Nodes\AuxiliaryNode;
 use Latte\Compiler\Nodes\Html\ElementNode;
-use Latte\Compiler\Nodes\TextNode;
-use Latte\Compiler\PrintContext;
-use Northrook\HTML\Element\Attributes;
-use Northrook\Minify;
-use Northrook\UI\Compiler\Element;
 use Northrook\HTML\Format;
-use Northrook\Logger\Log;
+use Northrook\HTML\HtmlNode;
+use Northrook\UI\Compiler\Element;
 use Northrook\UI\Compiler\NodeCompiler;
-use Northrook\UI\Compiler\NodeCompilerMethods;
-use Northrook\UI\Latte\Extension\RenderExtension;
-use Northrook\UI\Latte\RenderRuntime;
-use Northrook\UI\Latte\RuntimeRenderInterface;
-use Symfony\Component\VarExporter\VarExporter;
-use function Northrook\squish;
+use Northrook\UI\RenderRuntime;
 use function Northrook\stringStartsWith;
 use function Northrook\stringStripTags;
 use function Northrook\toString;
@@ -61,14 +51,14 @@ final class Heading extends Element
             $this->tag->set( 'hgroup' );
         }
 
-        $this->content( [ "heading" => "<$tag>" . Format::textContent( $this->heading ) . "</$tag>" ] );
+        $this->content( [ "heading" => "<$tag>" . Format::inline( $this->heading ) . "</$tag>" ] );
 
         if ( $this->subheading ?? false ) {
             $tag = $this->hGroup ? 'p' : 'small';
             $this->content(
                 [
                     'subheading' => "<$tag class=\"subheading\">"
-                                    . Format::textContent( $this->subheading )
+                                    . Format::inline( $this->subheading )
                                     . "</$tag>",
                 ],
                 $this->subheadingBefore,
@@ -82,6 +72,8 @@ final class Heading extends Element
     {
         if ( \is_array( $heading ) ) {
             foreach ( $heading as $key => $value ) {
+                $value = HtmlNode::unwrap( $value, 'span' );
+
                 if ( stringStartsWith( $key, [ 'small', 'p' ] ) ) {
                     $this->subheading(
                         $value,
@@ -98,9 +90,7 @@ final class Heading extends Element
 
         $heading = \trim( toString( $heading ) );
 
-        if ( \str_starts_with( $heading, '<' ) || \str_ends_with( $heading, '>' ) ) {
-            Log::error( 'The provided heading content should not be wrapped in any element.' );
-        }
+        $heading = HtmlNode::unwrap( $heading, 'span' );
 
         $this->heading    = $heading;
         $this->subheading ??= $subheading;
@@ -198,7 +188,7 @@ final class Heading extends Element
         return $content;
     }
 
-    public static function nodeCompiler( Node $node ) : AuxiliaryNode
+    public static function nodeCompiler( ElementNode $node ) : AuxiliaryNode
     {
         $node = new NodeCompiler( $node );
 
@@ -214,6 +204,6 @@ final class Heading extends Element
 
     public static function runtimeRender( string $level = 'h1', array $content = [], array $attributes = [] ) : string
     {
-        return new Heading( $level, $content, attributes : $attributes );
+        return (string) new Heading( $level, $content, attributes : $attributes );
     }
 }

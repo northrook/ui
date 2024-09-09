@@ -4,15 +4,15 @@ namespace Northrook\UI\Component;
 
 use Latte\Compiler\Node;
 use Latte\Compiler\Nodes\AuxiliaryNode;
+use Latte\Compiler\Nodes\Html\ElementNode;
 use Latte\Runtime\Html;
 use Latte\Runtime\HtmlStringable;
-use Northrook\Logger\Log;
 use Northrook\Time;
 use Northrook\Trait\PropertyAccessor;
 use Northrook\UI\Compiler\Component;
 use Northrook\UI\Compiler\NodeCompiler;
 use Northrook\UI\IconPack;
-use Northrook\UI\Latte\RenderRuntime;
+use Northrook\UI\RenderRuntime;
 use function Northrook\hashKey;
 use function Northrook\normalizeKey;
 use const Cache\DISABLED;
@@ -166,7 +166,7 @@ final class Notification extends Component
         return count( $this->instances );
     }
 
-    public static function nodeCompiler( Node $node ) : AuxiliaryNode
+    public static function nodeCompiler( ElementNode $node ) : AuxiliaryNode
     {
         return RenderRuntime::auxiliaryNode(
             renderName : Notification::class,
@@ -182,8 +182,8 @@ final class Notification extends Component
             'message'     => null,
             'description' => null,
             'timeout'     => null,
-
         ];
+
         foreach ( $attributes as $variable => $value ) {
             if ( \array_key_exists( $variable, $arguments ) ) {
                 $arguments[ $variable ] = $value;

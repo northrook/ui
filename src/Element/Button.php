@@ -4,6 +4,7 @@ namespace Northrook\UI\Element;
 
 use Latte\Compiler\Node;
 use Latte\Compiler\Nodes\AuxiliaryNode;
+use Latte\Compiler\Nodes\Html\ElementNode;
 use Northrook\Minify;
 use Northrook\UI\Compiler\Element;
 use Northrook\UI\Compiler\NodeCompiler;
@@ -12,7 +13,7 @@ use Northrook\UI\Compiler\NodeCompiler;
 class Button extends Element
 {
 
-    public static function nodeCompiler( Node $node ) : AuxiliaryNode
+    public static function nodeCompiler( ElementNode $node ) : AuxiliaryNode
     {
         $node = new NodeCompiler( $node );
         return new AuxiliaryNode(
