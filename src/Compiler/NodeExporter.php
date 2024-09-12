@@ -100,17 +100,22 @@ final class NodeExporter
     {
         $export = [];
 
+        // dump( $arguments );
+
         foreach ( $arguments as $name => $value ) {
-            $argument = \is_string( $name ) ? "$name: " : '';
+            $argument = \is_string( $name ) ? "'$name' =>" : '';
             $argument .= match ( \gettype( $value ) ) {
-                'string' => self::string( $value ),
-                'array'  => self::array( $value ),
-                'NULL' => self::string( 'null' ),
+                'string'  => self::string( $value ),
+                'array'   => self::array( $value ),
+                'NULL'    => 'null',
+                'boolean' => self::boolean( $value ),
             };
             $export[] = $argument;
         }
 
         $string = \implode( ', ' . PHP_EOL, $export ) . PHP_EOL;
+
+        // dump( $export );
 
         return "[ $string ]";
     }
@@ -125,11 +130,11 @@ final class NodeExporter
         return $value;
     }
 
-    public static function array( array $array ) : string
+    public static function array( array $argument ) : string
     {
-        $argument = \array_filter( $array, 'is_string' );
+        // dump( $argument );
 
-        if ( !$argument ) {
+        if ( empty( $argument ) ) {
             return "[]";
         }
 

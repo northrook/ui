@@ -2,8 +2,15 @@
 
 namespace Northrook\UI\Component\Breadcrumbs;
 
-final class Trail implements \Countable
+use IteratorAggregate;
+use Traversable;
+
+
+final class Trail implements \Countable, IteratorAggregate
 {
+    /**
+     * @var Item[]
+     */
     private array $breadcrumbs = [];
 
     public function add(
@@ -11,16 +18,27 @@ final class Trail implements \Countable
         ?string        $href = null,
         array | string $class = [],
         ?string        $icon = null,
-    ) : Trail {
+    ) : Trail
+    {
         $this->breadcrumbs[] = new Item( $title, $href, (array) $class, $icon );
         return $this;
     }
 
-    public function getBreadcrumbs() : array {
+    public function getBreadcrumbs() : array
+    {
         return $this->breadcrumbs;
     }
 
-    public function count() : int {
+    public function count() : int
+    {
         return \count( $this->breadcrumbs );
+    }
+
+    /**
+     * @return \Traversable<Item>
+     */
+    public function getIterator() : Traversable
+    {
+        return new \ArrayIterator( $this->breadcrumbs );
     }
 }

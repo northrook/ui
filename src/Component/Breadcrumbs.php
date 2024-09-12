@@ -5,6 +5,8 @@ namespace Northrook\UI\Component;
 use Latte\Compiler\Node;
 use Latte\Compiler\Nodes\AuxiliaryNode;
 use Latte\Compiler\Nodes\Html\ElementNode;
+use Northrook\HTML\Element;
+use Northrook\UI\Compiler\AbstractComponent;
 use Northrook\UI\Compiler\Component;
 use Northrook\UI\Compiler\NodeCompiler;
 use Northrook\UI\Component\Breadcrumbs\Trail;
@@ -18,39 +20,66 @@ use Northrook\UI\RenderRuntime;
  * @link https://www.aditus.io/patterns/breadcrumbs
  * @link https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/examples/breadcrumb
  */
-class Breadcrumbs extends Component
+class Breadcrumbs extends AbstractComponent
 {
 
-    public const string      SCHEMA = 'RDFa';
-    protected const ?string  TYPE   = 'breadcrumbs';
+    public const string SCHEMA = 'RDFa';
+
+    private readonly ?Element $component;
+    public readonly Trail     $breadcrumbs;
 
     final public function __construct(
-        array                          $attributes = [],
-        private readonly array | Trail $breadcrumbs = [],
+        ?Trail                   $breadcrumbs = null,
+        array                    $attributes = [],
+        private readonly ?string $parent = null,
     )
     {
-        parent::__construct( $attributes );
-        $this->attributes->add( 'class', 'breadcrumbs' );
+        $this->component = $parent ? new Element( $parent, $attributes ) : new Element( 'ol', $attributes );
+        $this->component->class( 'breadcrumbs' );
+        $this->breadcrumbs = $breadcrumbs ?? new Trail();
     }
 
-    protected function render() : string
+    protected function build() : string
     {
-        return $this->latte( __DIR__ . '/Breadcrumbs/breadcrumbs.latte' );
-    }
+        $breadcrumbs = [];
 
-    final protected function getBreadcrumbTrail() : array
-    {
-        if ( $this->breadcrumbs instanceof Trail ) {
-            return $this->breadcrumbs->getBreadcrumbs();
+        foreach ( $this->breadcrumbs as $index => $item ) {
+            $label = "{$item->icon}<span property=\"name\">{$item->title}</span>";
+            if ( $item->href ) {
+                $trail = Element::a( $label, $item->href, target : '_self', property : 'item', typeOf : 'WebPage' );
+            }
+            else {
+                $trail = $label;
+            }
+
+            $breadcrumbs[] = Element::li(
+                content  : [
+                               $trail,
+                               Element::meta( property : 'position', content : $index + 1 ),
+                           ],
+                class    : $item->classes,
+                property : 'itemListElement',
+                typeof   : 'ListItem',
+            )->toString();
         }
-        return $this->breadcrumbs;
-    }
 
-    final public function list() : array
-    {
-        $trail = [ 0 => '0th', ...$this->getBreadcrumbTrail() ];
-        unset( $trail[ 0 ] );
-        return $trail;
+        $attributes = [
+            'class'  => 'breadcrumbs',
+            'vocab'  => 'https://schema.org/',
+            'typeof' => 'BreadcrumbList',
+        ];
+
+        if ( $this->parent ) {
+            $this->component->content( new Element( 'ol', $attributes, $breadcrumbs ) );
+        }
+        else {
+            $this->component
+                ->content( $breadcrumbs )
+                ->attributes( $attributes )
+            ;
+        }
+
+        return $this->component;
     }
 
     static public function getAssets() : array
@@ -61,16 +90,24 @@ class Breadcrumbs extends Component
         ];
     }
 
-    public static function nodeCompiler( ElementNode $node ) : AuxiliaryNode
+    public static function nodeCompiler( NodeCompiler $node ) : AuxiliaryNode
     {
         return RenderRuntime::auxiliaryNode(
             renderName : Breadcrumbs::class,
-            arguments  : NodeCompiler::getComponentArguments( $node ),
+            arguments  : [
+                             $node->arguments()[ 'breadcrumbs' ] ?? [],
+                             $node->attributes(),
+                             $node->tag( 'nav' ),
+                         ],
         );
     }
 
-    public static function runtimeRender( array $attributes = [], array $breadcrumbs = [] ) : string
+    public static function runtimeRender(
+        array | Trail $breadcrumbs = [],
+        array         $attributes = [],
+        ?string       $tag = null,
+    ) : string
     {
-        return (string) new self( $attributes, ...$breadcrumbs );
+        return (string) new Breadcrumbs( $breadcrumbs, $attributes, $tag );
     }
 }

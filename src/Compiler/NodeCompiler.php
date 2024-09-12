@@ -4,6 +4,7 @@ declare( strict_types = 1 );
 
 namespace Northrook\UI\Compiler;
 
+use JetBrains\PhpStorm\Deprecated;
 use Latte\Compiler\Node;
 use Latte\Compiler\NodeHelpers;
 use Latte\Compiler\Nodes\AreaNode;
@@ -17,10 +18,14 @@ use Latte\ContentType;
 use Northrook\HTML\Element;
 use Northrook\HTML\Element\Attributes;
 use Northrook\Logger\Log;
+use Northrook\Minify;
 use Northrook\UI\Compiler\Node\ChildNode;
 use Northrook\UI\Compiler\Node\PrintedNode;
 use Latte\Essential\Nodes\PrintNode;
+use function Northrook\arrayFilter;
+use function Northrook\squish;
 use const Northrook\EMPTY_STRING;
+use const Northrook\WHITESPACE;
 
 
 /**
@@ -33,45 +38,75 @@ class NodeCompiler
     use NodeCompilerMethods;
 
 
+    public const string HTML_NS = "UI";
+
     protected const array PROPERTY_ALIAS = [
         'tag' => 'name',
     ];
 
     public bool $hasExpression = false;
 
-    public function __construct( protected Node $node, private ?NodeCompiler $parent = null ) {}
+    public function __construct(
+        protected Node                 $node,
+        private readonly ?NodeCompiler $parent = null,
+    ) {}
 
     public function __get( string $property )
     {
-        if ( \array_key_exists( $property, $this::PROPERTY_ALIAS ) ) {
-            $property = $this::PROPERTY_ALIAS[ $property ];
-        }
-
-        if ( !\property_exists( $this->node, $property ) ) {
-            return null;
-        }
         return match ( $property ) {
-            'name'  => $this->node->name,
-            default => null
+            'name', 'tag' => $this->getNodeName(),
+            default       => null
         };
     }
 
     // :: CHECKS :::
+
+    private function getNodeName() : string
+    {
+        return $this->node?->name ?? throw new \LogicException( 'Undefined property: `name`.' );
+    }
 
     public function isTextNode() : bool
     {
         return $this->node instanceof TextNode;
     }
 
-    public function isElementNode( string ...$withTag ) : bool
+    final public function tag( string ...$match ) : ?string
+    {
+        if ( \str_starts_with( $this->getNodeName(), \strtolower( $this::HTML_NS ) ) ) {
+            return null;
+        }
+
+        if ( $tags = array_intersect( \explode( ':', $this->getNodeName() ), $match ) ) {
+            return \array_shift( $tags );
+        };
+
+        return null;
+    }
+
+    final public function is( string $name ) : bool
+    {
+        if ( !$this->node instanceof ElementNode
+            // ||
+            // !\str_contains( $this->node->name, ':' )
+        ) {
+            return false;
+        }
+
+        // dump( $this->node->name, $name );
+
+        return \str_contains( $this->node->name, \strtolower( $name ) );
+    }
+
+    public function isElementNode( string ...$tag ) : bool
     {
         if ( !$this->node instanceof ElementNode ) {
             return false;
         }
-        if ( empty( $withTag ) ) {
+        if ( empty( $tag ) ) {
             return false;
         }
-        return \in_array( $this->node->name, $withTag, true );
+        return \in_array( $this->node->name, $tag, true );
     }
 
     public function isFragmentNode() : bool
@@ -107,7 +142,6 @@ class NodeCompiler
 
     public function printNode( ?Node $node = null, ?PrintContext $context = null ) : PrintedNode
     {
-        // dump( $node );
         $printed = new PrintedNode( $node ?? $this->node, $context );
         if ( $printed->isExpression && isset( $this->parent ) ) {
             $this->parent->hasExpression = true;
@@ -119,30 +153,19 @@ class NodeCompiler
 
     // :: NODE :::
 
-    /**
-     * @param ?ElementNode  $from
-     *
-     * @return NodeCompiler[]
-     */
-    public function getContent( ?ElementNode $from = null ) : iterable
-    {
-        $array = [];
-        foreach ( \iterator_to_array( ( $from ?? $this->node )->content ) as $key => $node ) {
-            if ( $this->isEmptyText( $node ) ) {
-                continue;
-            }
-
-            $array[ $key ] = $this->childNode( $node );
-            // $array[ $key ] = new ChildNode();
-        }
-        return $array;
-    }
-
     // :: END NODE
 
-    public static function getComponentArguments( Node $node) : array
+    public function iterateChildNodes() : iterable
     {
-        return ( new NodeCompiler( $node))->resolveComponentArguments();
+        if ( $this->node instanceof ElementNode ) {
+            return $this->node->content->getIterator();
+        }
+        return [];
+    }
+
+    public static function getComponentArguments( Node $node ) : array
+    {
+        return ( new NodeCompiler( $node ) )->resolveComponentArguments();
     }
 
     final public function resolveComponentArguments( ?ElementNode $node = null ) : array
@@ -185,6 +208,22 @@ class NodeCompiler
         ];
     }
 
+    public function properties( string | array ...$keys ) : array
+    {
+        $properties = [];
+        $attributes = $this->attributes();
+
+        foreach ( $keys as $key ) {
+            $default            = \is_array( $key ) ? $key[ \array_key_first( $key ) ] : null;
+            $key                = \is_array( $key ) ? \array_key_first( $key ) : $key;
+            $value              = $attributes[ $key ] ?? $default;
+            $properties[ $key ] = $value;
+            unset( $attributes[ $key ] );
+        }
+
+        return [ ... $properties, 'attributes' => $attributes ];
+    }
+
     /**
      * Extract {@see ElementNode::$attributes} to `array`.
      *
@@ -196,13 +235,53 @@ class NodeCompiler
      */
     public function attributes( ?ElementNode $from = null ) : array
     {
+        // TODO : Does NOT account for expressions or n:tags at this point
         $attributes = [];
         foreach ( static::getAttributeNodes( $from ?? $this->node ) as $attribute ) {
             $name                = NodeHelpers::toText( $attribute->name );
             $value               = NodeHelpers::toText( $attribute->value );
             $attributes[ $name ] = $value;
         }
+        // dump( $attributes );
         return $attributes;
+    }
+
+    /**
+     * Parses an {@see ElementNode} and extracts PHP variables and expressions.
+     *
+     * @param ?ElementNode  $from
+     *
+     * @return array
+     */
+    public function arguments( ?ElementNode $from = null ) : array
+    {
+        $arguments = [];
+        $from      ??= $this->node;
+
+        if ( !$from instanceof ElementNode ) {
+            Log::error(
+                '{method} can only parse {nodeType}.',
+                [
+                    'method'   => __METHOD__,
+                    'nodeType' => $from::class,
+                ],
+            );
+            return [];
+        }
+
+        foreach ( $from->attributes->children as $index => $attribute ) {
+            if ( !$attribute instanceof AttributeNode ) {
+                continue;
+            }
+
+            if ( $attribute->name instanceof PrintNode ) {
+                $attribute         = $this->printNode( $attribute->name );
+                $key               = \trim( $attribute->variable, "$" );
+                $arguments[ $key ] = $attribute->expression;
+            }
+        }
+
+        return $arguments;
     }
 
     /**
@@ -220,21 +299,86 @@ class NodeCompiler
                 continue;
             }
 
-            if ( $attribute instanceof AttributeNode ) {
+            if ( $attribute instanceof AttributeNode
+                 && !$attribute->name instanceof PrintNode
+            ) {
                 $attributes[] = $attribute;
             }
         }
         return $clean ? $node->attributes->children : $attributes;
     }
 
+    public function node() : Node
+    {
+        return $this->node;
+    }
+
+    #[Deprecated( replacement : '%class%->node()' )]
     public function returnNode() : Node
     {
         return $this->node;
     }
 
-    public function returnAuxiliaryNode() : AuxiliaryNode
+    /**
+     * @param ElementNode  $from
+     * @param int          $level
+     *
+     * @return array
+     */
+    public function getContent( ElementNode $from, int &$level ) : array
     {
-        return new AuxiliaryNode( fn() => $this->node->name );
+        $content = [];
+        $level++;
+
+        foreach ( $from->content->getIterator() as $index => $node ) {
+            if ( $node instanceof TextNode ) {
+                if ( !$value = squish( NodeHelpers::toText( $node ) ) ) {
+                    continue;
+                }
+                $content[ $index ] = $value;
+            }
+
+            if ( $node instanceof PrintNode ) {
+                $node = $this->printNode( $node );
+                $key  = $node->variable ?? "\${$index}";
+
+                $content[ "$key:$index" ] = $node->value;
+            }
+
+            if ( $node instanceof ElementNode ) {
+                $content[ "$node->name:$index" ] = [
+                    'attributes' => $this->attributes( $node ),
+                    'content'    => $this->getContent( $node, $level ),
+                ];
+                continue;
+            }
+            //
+            // $content[ $index ] = NodeHelpers::toText( $node );
+        }
+
+        return $content;
+    }
+
+    public function parseContent( ?ElementNode $from = null ) : array
+    {
+        /** @var ElementNode $from */
+        $from  ??= $this->node;
+        $level = 0;
+
+        $arguments = $this->getContent( $from, $level );
+
+        // foreach ( $from->content->children as $index => $node ) {
+        //     if ( $this->isEmptyText( $node ) ) {
+        //         continue;
+        //     }
+        //     if ( $node instanceof ElementNode ) {
+        //         $arguments = [ ... $arguments, ...$this->parseContent( $node ) ];
+        //     }
+
+        //     // if ( $this->)
+        // }
+
+        return $arguments;
     }
 
     public function childNode( Node $node ) : ChildNode
@@ -318,6 +462,23 @@ class NodeCompiler
         }
 
         return $attributes;
+    }
+
+    public function htmlContent() : string
+    {
+        if ( !\property_exists( $this->node, 'content' ) ) {
+            Log::error(
+                'The NodeCompiler could not parse the requested {method}, as the {nodeType} does not have a {property} property. Returned {result}.',
+                [
+                    'method'   => 'htmlContent',
+                    'nodeType' => $this->node::class,
+                    'property' => 'content',
+                    'result'   => 'empty string',
+                ],
+            );
+            return EMPTY_STRING;
+        }
+        return NodeHelpers::toText( $this->node->content );
     }
 
 }

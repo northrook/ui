@@ -89,6 +89,7 @@ final class RenderRuntime
                     $item->expiresAfter( $cache );
                     $string = [ $className, $this::METHOD ]( ...$arguments );
 
+                    return $string;
                     return Minify::HTML( $string );
                 },
             );
