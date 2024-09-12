@@ -4,41 +4,53 @@ namespace Northrook\UI\Component;
 
 use Latte\Compiler\Nodes\AuxiliaryNode;
 use Northrook\HTML\Element;
+use Northrook\HTML\Element\Attributes;
 use Northrook\HTML\Format;
 use Northrook\Time;
 use Northrook\UI\Compiler\AbstractComponent;
 use Northrook\UI\Compiler\NodeCompiler;
 use Northrook\UI\IconPack;
 use Northrook\UI\RenderRuntime;
+use function Northrook\filterHtmlText;
 use function Northrook\normalizeKey;
 
 
 class Notification extends AbstractComponent
 {
-
     private array $instances = [];
+
+    public readonly string             $type;
+    public readonly string             $message;
+    public readonly ?string            $description;
+    public readonly Element\Attributes $attributes;
+    public ?int                        $timeout = null;
 
     protected readonly Element $component;
 
     public function __construct(
-        private string              $type = 'notice',
-        private ?string             $message = null,
-        private ?string             $description = null,
-        private null | int | string $timeout = null,
-        array                       $attributes = [],
+        string              $type = 'notice',
+        ?string             $message = null,
+        ?string             $description = null,
+        null | int | string $timeout = null,
+        array               $attributes = [],
     )
     {
-        $this->component = new Element( 'toast', $attributes );
-        if ( !\is_numeric( $timeout ) ) {
-            $timeout = ( \strtotime( $timeout, 0 ) ) * 100;
-        }
+        $this->type        = filterHtmlText( $type );
+        $this->message     = filterHtmlText( $message ?? \ucfirst( $this->type ) );
+        $this->description = $description ? filterHtmlText( $description ) : null;
+        $this->setTimeout( $timeout );
+        $this->component  = new Element( 'toast', $attributes );
+        $this->attributes = $this->component->attributes;
         $this->component->class( 'notification', $type, prepend : true );
 
         $this->instances[] = new Time();
     }
 
-    public function setTimeout( int $timeout ) : self
+    public function setTimeout( null | int | string $timeout ) : self
     {
+        if ( !\is_numeric( $timeout ) ) {
+            $timeout = ( \strtotime( $timeout, 0 ) ) * 100;
+        }
         $this->timeout = $timeout;
         return $this;
     }
