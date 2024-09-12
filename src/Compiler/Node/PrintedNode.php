@@ -43,6 +43,7 @@ final class PrintedNode implements \Stringable
     private function parsePrintNode() : void
     {
         $this->value        = \trim( \preg_replace( '#echo (.+) /\*.+?;#', "$1 ", $this->print() ) );
+        // dump( $this->value );
         $this->variable     = pregExtract( '#\$(\w+)(?=\s|:|\?|$)#', $this->value );
         $this->expression     = pregExtract( '#\$(.+?)(?=\)|$)#', $this->value );
         $this->isExpression = true;

@@ -17,6 +17,7 @@ use Northrook\UI\Component\Button;
 use Northrook\UI\Component\Code;
 use Northrook\UI\Component\Heading;
 use Northrook\UI\Component\Icon;
+use Northrook\UI\Component\Menu;
 use Northrook\UI\Component\Notification;
 use Northrook\UI\RenderRuntime;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -65,6 +66,7 @@ final class UiCompileExtension extends Latte\Extension
             // $this::isElement( $node, 'code' )   => Code::nodeCompiler( $node ),
             $component->is( 'button' ) => Button::nodeCompiler( $component ),
             $component->is( 'icon' )   => Icon::nodeCompiler( $component ),
+            $component->is( 'menu' )     => Menu::nodeCompiler( $component ),
             $component->is( 'breadcrumbs' )     => Breadcrumbs::nodeCompiler( $component ),
             $component->is( 'ui:notification' ) => Notification::nodeCompiler( $component ),
             default                             => null

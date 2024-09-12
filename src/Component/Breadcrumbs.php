@@ -7,7 +7,6 @@ use Latte\Compiler\Nodes\AuxiliaryNode;
 use Latte\Compiler\Nodes\Html\ElementNode;
 use Northrook\HTML\Element;
 use Northrook\UI\Compiler\AbstractComponent;
-use Northrook\UI\Compiler\Component;
 use Northrook\UI\Compiler\NodeCompiler;
 use Northrook\UI\Component\Breadcrumbs\Trail;
 use Northrook\UI\RenderRuntime;
