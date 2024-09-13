@@ -1,0 +1,34 @@
+:root {
+  --intent       : var(--baseline-500);
+  --intent-light : var(--baseline-700);
+}
+
+.intent\:primary {
+  --intent       : var(--primary-500);
+  --intent-light : var(--primary-600);
+}
+
+.intent\:success {
+  --intent       : var(--success);
+  --intent-light : var(--success-light);
+}
+
+.intent\:info {
+  --intent       : var(--info);
+  --intent-light : var(--info-lighter);
+}
+
+.intent\:notice {
+  --intent       : var(--notice);
+  --intent-light : var(--notice-lighter);
+}
+
+.intent\:warning {
+  --intent       : var(--warning);
+  --intent-light : var(--warning-lighter);
+}
+
+.intent\:error {
+  --intent       : var(--danger);
+  --intent-light : var(--danger-lighter);
+}

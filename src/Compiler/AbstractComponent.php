@@ -11,6 +11,7 @@ use Northrook\UI\RenderRuntime;
 use function Northrook\classBasename;
 use function Northrook\hashKey;
 use function Northrook\stringStartsWith;
+use function Northrook\toString;
 use const Northrook\WHITESPACE;
 
 
@@ -31,9 +32,6 @@ abstract class AbstractComponent implements RuntimeRenderInterface
         }
 
         return $element;
-
-        // Trim off the index, return as-is
-        // return \substr( $element, 0, $index );
     }
 
     private static function appendTextString( string $value, array &$content ) : void
@@ -55,15 +53,6 @@ abstract class AbstractComponent implements RuntimeRenderInterface
         }
     }
 
-    // private static function appendHtmlElement( string $element, array $value, array &$content ) : void
-    // {
-    //     $content[ $element ] = static::recursiveElement(
-    //         tag        : $element,
-    //         attributes : \array_shift( $value ),
-    //         content    : $value,
-    //     );
-    // }
-
     private static function recursiveElement( array $array, null | string | int $key = null ) : string | array
     {
         // If $key is string, this iteration is an element
@@ -72,7 +61,7 @@ abstract class AbstractComponent implements RuntimeRenderInterface
             $attributes = $array[ 'attributes' ];
             $array      = $array[ 'content' ];
 
-            if ( \str_ends_with( $tag, 'icon') && $get = $attributes[ 'get' ] ?? null ) {
+            if ( \str_ends_with( $tag, 'icon' ) && $get = $attributes[ 'get' ] ?? null ) {
                 unset( $attributes[ 'get' ] );
                 return (string) new Icon( $tag, $get, $attributes );
             }
@@ -90,21 +79,15 @@ abstract class AbstractComponent implements RuntimeRenderInterface
             else {
                 static::appendTextString( $value, $content );
             }
-
-            // Unnamed elements will be truncated as single simple text strings
-            // if ( \is_int( $elementKey ) ) {
-            // }
         }
 
-        // $tag = \strstr( $tag, ':', true );
-        //
         if ( \is_string( $key ) ) {
-            $result = new HTML\Element( $tag, $attributes, $content );
+            $element = new HTML\Element( $tag, $attributes, $content );
+
+            return $element->toString( WHITESPACE );
         }
-        else {
-            return $content;
-        }
-        return (string) $result;
+
+        return $content;
     }
 
     final protected static function parseContentArray( array $array ) : array

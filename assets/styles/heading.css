@@ -1,5 +1,5 @@
 :root {
-  --heading-font-family : 'Iosevka Workstation', sans-serif;
+  --heading-font-family : 'Dev Workstation', sans-serif;
   /*--h1-size: ;*/
   --scroll-margin-top   : 10px;
   --heading-weight      : 500;
@@ -27,9 +27,19 @@ h4, .h4 {
 /* Single headings */
 .heading {
   margin-block : calc(calc(var(--heading-line-height, 2em) - 1em) * -.5);
-  font-family  : var(--font-family), sans-serif;
+  font-family  : var(--heading-font-family), sans-serif;
   font-weight  : var(--heading-weight);
   line-height  : var(--heading-line-height, 2em);
+}
+
+/* Evenly distribute line length */
+.heading  > span {
+  text-wrap : balance;
+  display   : inline-block;
+}
+.heading  > span span {
+  text-wrap : pretty;
+
 }
 
 .heading .subheading {

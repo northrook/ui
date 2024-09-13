@@ -17,18 +17,38 @@ class Button extends AbstractComponent
     public function __construct(
         protected readonly Type $type = Type::Button,
         array                   $attributes = [],
-        array                   $content = [],
+        private array           $content = [],
     )
     {
-        $this->button = new Element( 'button', $attributes, $content );
-        $this->button->attributes
-            ->set( 'class', 'button', true )
-            ->add( 'type', 'button' )
-        ;
+        $this->button = new Element( 'button', $attributes );
+        $this->button->class(
+            'button', prepend : true,
+        )->attributes->add( 'type', 'button' );
     }
 
     protected function build() : string
     {
+        $content = [];
+        foreach ( $this->content as $index => $html ) {
+            if ( \str_starts_with( $index, 'icon' ) ) {
+                $content[ 'icon' ] = $html;
+                continue;
+            }
+
+            if ( isset( $content[ 'content' ] ) ) {
+                $content[ 'content' ] .= " $html";
+            }
+            else {
+                $content[ 'content' ] = $html;
+            }
+        }
+
+        if ( !\str_starts_with( $content[ 'content' ], '<span' ) ) {
+            $content[ 'content' ] = "<span>{$content[ 'content' ]}</span>";
+        }
+
+        $this->button->content( $content );
+
         return ( string ) $this->button;
     }
 
@@ -53,8 +73,7 @@ class Button extends AbstractComponent
         return (string) new Button(
             Type::from( $type ),
             $attributes,
-            Button::parseContentArray($content),
+            Button::parseContentArray( $content ),
         );
     }
-
 }

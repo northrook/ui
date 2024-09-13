@@ -1,209 +1,220 @@
 #notifications {
-    max-width : 80vw;
+  max-width : 80vw;
 }
 
 toast {
-    position        : relative;
+  position        : relative;
 
-    max-height      : 8rem;
-    min-width       : 210px;
-    margin-bottom   : var(--gap);
-    border-radius   : .25rem;
+  max-height      : 8rem;
+  min-width       : 210px;
+  margin-bottom   : var(--gap);
+  border-radius   : .25rem;
 
-    font-size       : var(--font-size-small);
+  font-size       : var(--font-size-small);
 
-    transition      : opacity 200ms ease, transform 200ms ease, max-height 200ms ease, margin 200ms ease, background-color 200ms ease;
-    transform       : translateX(0);
-    opacity         : 1;
+  transition      : opacity 200ms ease, transform 200ms ease, max-height 200ms ease, margin 200ms ease, background-color 200ms ease;
+  transform       : translateX(0);
+  opacity         : 1;
 
-    backdrop-filter : blur(5px);
-    box-shadow      : 1px 1px 1rem -.125rem var(--shadow-color);
+  backdrop-filter : blur(5px);
+  box-shadow      : 1px 1px 1rem -.125rem var(--shadow-color);
 }
 
 /* Background */
 toast::before {
-    content       : '';
-    z-index       : -1;
-    position      : absolute;
-    border-radius : .25rem;
-    inset         : 0;
-    background    : linear-gradient(-55deg, var(--background) 50%, var(--status-light) 100%);
-    transition    : opacity 300ms ease-in-out;
-    opacity       : .50;
+  content       : '';
+  z-index       : -1;
+  position      : absolute;
+  border-radius : .25rem;
+  inset         : 0;
+  background    : linear-gradient(-55deg, var(--background) 50%, var(--status-light) 100%);
+  transition    : opacity 300ms ease-in-out;
+  opacity       : .50;
 }
 
 /* Background:Hover */
 toast:hover::before, toast:focus-within::before, toast:focus::before {
-    opacity : .95;
+  opacity : .95;
 }
 
 toast.hidden {
-    opacity       : 0;
-    transform     : translateX(50%);
-    max-height    : 0;
-    margin-bottom : 0;
+  opacity       : 0;
+  transform     : translateX(50%);
+  max-height    : 0;
+  margin-bottom : 0;
 }
 
 
 /* Spoken aloud */
 toast output {
-    display        : flex;
-    flex-direction : column;
-    padding        : .75rem 2rem .75rem .75rem;
-    gap            : 0.5rem;
-    overflow       : hidden;
+  display        : flex;
+  flex-direction : column;
+  padding        : .75rem 2rem .75rem .75rem;
+  gap            : 0.5rem;
+  overflow       : hidden;
 }
 
 toast output > * {
-    line-height : 1rem;
+  line-height : 1rem;
 }
 
 /* Status */
 
 toast i.status {
-    display     : flex;
-    align-items : center;
-    gap         : .5rem;
-    line-height : 1;
+  display     : flex;
+  align-items : center;
+  gap         : .5rem;
+  line-height : 1;
 }
 
 toast i.status svg.icon {
-    height : 1rem;
-    width  : 1rem;
-    color  : var(--status);
+  height : 1rem;
+  width  : 1rem;
+  color  : var(--status);
 }
 
 toast i.status > span {
-    height         : 1rem;
-    color          : var(--status);
-    text-transform : capitalize;
+  height         : 1rem;
+  color          : var(--status);
+  text-transform : capitalize;
+}
+/* TODO : Improve this by using display:block; when the time is considered 'Now' to avoid announcing the full date*/
+toast i.status > time {
+  position     : absolute;
+  width        : 1px;
+  height       : 1px;
+  padding      : 0;
+  margin       : -1px;
+  overflow     : hidden;
+  clip         : rect(0, 0, 0, 0);
+  white-space  : nowrap;
+  border-width : 0;
 }
 
-
 toast.compact output {
-    flex-direction : row;
+  flex-direction : row;
 }
 
 toast.compact i.status > span,
 toast.compact i.status > time {
-    display : none;
+  display : none;
 }
 
 section > toast > button.close {
-    position   : absolute;
-    top        : 0;
-    right      : 0;
-    opacity    : .25;
-    transition : opacity 200ms ease;
+  position   : absolute;
+  top        : 0;
+  right      : 0;
+  opacity    : .25;
+  transition : opacity 200ms ease;
 }
 
 section > toast > button.close:focus-visible,
 section > toast > button.close:hover {
-    opacity : 1;
+  opacity : 1;
 }
 
 section > toast:focus-within > button.close,
 section > toast:hover > button.close {
-    opacity : .5;
+  opacity : .5;
 }
 
 toast > div.progress-bar {
-    content        : '';
-    position       : absolute;
-    right          : 0;
-    bottom         : 0;
-    height         : .25rem;
-    width          : 100%;
-    border-radius  : 0 0 .25rem .25rem;
-    pointer-events : none;
-    /*transition     : opacity 200ms ease;*/
-    opacity        : 1;
-    z-index        : -1;
-    overflow       : hidden;
+  content        : '';
+  position       : absolute;
+  right          : 0;
+  bottom         : 0;
+  height         : .25rem;
+  width          : 100%;
+  border-radius  : 0 0 .25rem .25rem;
+  pointer-events : none;
+  /*transition     : opacity 200ms ease;*/
+  opacity        : 1;
+  z-index        : -1;
+  overflow       : hidden;
 }
 
 toast:not(.hidden) > div.progress-bar::after {
-    content             : '';
-    position            : absolute;
-    right               : 0;
-    bottom              : 0;
-    /*height				: 100%;*/
-    height              : .125rem;
-    width               : 100%;
-    background-color    : var(--status);
-    animation           : toastTimeOut var(--timeout) ease-out;
-    animation-fill-mode : both;
-    animation-direction : normal;
-    /*animation-fill-mode : ;*/
+  content             : '';
+  position            : absolute;
+  right               : 0;
+  bottom              : 0;
+  /*height				: 100%;*/
+  height              : .125rem;
+  width               : 100%;
+  background-color    : var(--status);
+  animation           : toastTimeOut var(--timeout) ease-out;
+  animation-fill-mode : both;
+  animation-direction : normal;
+  /*animation-fill-mode : ;*/
 }
 
 toast:hover:not(.hidden) > div.progress-bar::after {
-    animation-play-state : paused;
-    /*animation : toastTimePause var(--timeout) ease-out;*/
+  animation-play-state : paused;
+  /*animation : toastTimePause var(--timeout) ease-out;*/
 }
 
 toast button.close {
-    /*background-color : orangered;*/
-    position   : absolute;
-    top        : 0;
-    right      : 0;
-    bottom     : 0;
-    width      : 1.5rem;
-    display    : flex;
-    padding    : .25rem;
-    color      : currentColor;
-    opacity    : 0.5;
-    transition : opacity 200ms ease, color 200ms ease;
+  /*background-color : orangered;*/
+  position   : absolute;
+  top        : 0;
+  right      : 0;
+  bottom     : 0;
+  width      : 1.5rem;
+  display    : flex;
+  padding    : .25rem;
+  color      : currentColor;
+  opacity    : 0.5;
+  transition : opacity 200ms ease, color 200ms ease;
 }
 
 toast:hover button {
-    opacity : 1;
+  opacity : 1;
 }
 
 toast button:hover {
-    color : hsla(var(--baseline-100));
+  color : hsla(var(--baseline-100));
 }
 
 @keyframes toastTimeOut {
-    25% {
-        width : 100%;
-    }
-    100% {
-        width : 0;
-    }
+  25% {
+    width : 100%;
+  }
+  100% {
+    width : 0;
+  }
 }
 
 @keyframes toastTimePause {
-    25% {
-        width : 0;
-    }
-    100% {
-        width : 100%;
-    }
+  25% {
+    width : 0;
+  }
+  100% {
+    width : 100%;
+  }
 }
 
 
 toast.success {
-    --status       : var(--success);
-    --status-light : var(--success-lighter);
+  --status       : var(--success);
+  --status-light : var(--success-lighter);
 }
 
 toast.info {
-    --status       : var(--info);
-    --status-light : var(--info-lighter);
+  --status       : var(--info);
+  --status-light : var(--info-lighter);
 }
 
 toast.notice {
-    --status       : var(--notice);
-    --status-light : var(--notice-lighter);
+  --status       : var(--notice);
+  --status-light : var(--notice-lighter);
 }
 
 toast.warning {
-    --status       : var(--warning);
-    --status-light : var(--warning-lighter);
+  --status       : var(--warning);
+  --status-light : var(--warning-lighter);
 }
 
 toast.error {
-    --status       : var(--danger);
-    --status-light : var(--danger-lighter);
+  --status       : var(--danger);
+  --status-light : var(--danger-lighter);
 }

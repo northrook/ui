@@ -165,7 +165,6 @@ final class Heading extends AbstractComponent
 
     public static function runtimeRender( string $level = 'h1', array $content = [], array $attributes = [] ) : string
     {
-        // dump($content);
         return (string) new Heading( $level, Heading::parseContentArray( $content ), attributes : $attributes );
     }
 }

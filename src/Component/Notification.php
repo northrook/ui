@@ -13,7 +13,32 @@ use Northrook\UI\IconPack;
 use Northrook\UI\RenderRuntime;
 use function Northrook\filterHtmlText;
 use function Northrook\normalizeKey;
+/*
+ # Accessibility
+ : https://github.com/WICG/accessible-notifications
+ : https://inclusive-components.design/notifications/
 
+    - Don't use aria-atomic="true" on live elements, as it will announce any change within it.
+    - Be judicious in your use of visually hidden live regions. Most content should be seen and heard.
+    - Distinguish parts of your interface in content or with content and style, but never just with style.
+    - Do not announce everything that changes on the page.
+    - Be very wary of Desktop notifications, may cause double announcements etc.
+
+
+ : https://atlassian.design/components/flag/examples
+    Used for confirmations, alerts, and acknowledgments
+    that require minimal user interaction.
+
+ : https://atlassian.design/components/banner/examples
+    Banner displays a prominent message at the top of the screen.
+
+    We may want to create a separate component, or have types
+    such as 'floating' using the Toast system, or 'static'
+    using fixed positioning 'top|bottom' with left/right/center.
+
+
+
+ */
 
 class Notification extends AbstractComponent
 {

@@ -81,14 +81,6 @@ class Breadcrumbs extends AbstractComponent
         return $this->component;
     }
 
-    static public function getAssets() : array
-    {
-        return [
-            __DIR__ . '/Breadcrumbs/breadcrumbs.css',
-            __DIR__ . '/Breadcrumbs/breadcrumbs.js',
-        ];
-    }
-
     public static function nodeCompiler( NodeCompiler $node ) : AuxiliaryNode
     {
         return RenderRuntime::auxiliaryNode(
@@ -108,5 +100,13 @@ class Breadcrumbs extends AbstractComponent
     ) : string
     {
         return (string) new Breadcrumbs( $breadcrumbs, $attributes, $tag );
+    }
+
+    static public function getAssets() : array
+    {
+        return [
+            __DIR__ . '/Breadcrumbs/breadcrumbs.css',
+            __DIR__ . '/Breadcrumbs/breadcrumbs.js',
+        ];
     }
 }
