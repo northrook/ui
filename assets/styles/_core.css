@@ -28,7 +28,7 @@
   --intent-light : var(--warning-lighter);
 }
 
-.intent\:error {
+.intent\:danger {
   --intent       : var(--danger);
   --intent-light : var(--danger-lighter);
 }

@@ -66,7 +66,7 @@ class Notification extends AbstractComponent
         $this->setTimeout( $timeout );
         $this->component  = new Element( 'toast', $attributes );
         $this->attributes = $this->component->attributes;
-        $this->component->class( 'notification', $type, prepend : true );
+        $this->component->class( "notification", "intent:$type", prepend : true );
 
         $this->instances[] = new Time();
     }

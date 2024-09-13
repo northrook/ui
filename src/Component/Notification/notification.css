@@ -27,7 +27,7 @@ toast::before {
   position      : absolute;
   border-radius : .25rem;
   inset         : 0;
-  background    : linear-gradient(-55deg, var(--background) 50%, var(--status-light) 100%);
+  background    : linear-gradient(-55deg, var(--background) 50%, var(--intent-light) 100%);
   transition    : opacity 300ms ease-in-out;
   opacity       : .50;
 }
@@ -68,16 +68,18 @@ toast i.status {
 }
 
 toast i.status svg.icon {
-  height : 1rem;
-  width  : 1rem;
-  color  : var(--status);
+  height    : 1rem;
+  width     : 1rem;
+  translate : 0 -.125em;
+  color     : var(--intent);
 }
 
 toast i.status > span {
   height         : 1rem;
-  color          : var(--status);
+  color          : var(--intent);
   text-transform : capitalize;
 }
+
 /* TODO : Improve this by using display:block; when the time is considered 'Now' to avoid announcing the full date*/
 toast i.status > time {
   position     : absolute;
@@ -141,7 +143,7 @@ toast:not(.hidden) > div.progress-bar::after {
   /*height				: 100%;*/
   height              : .125rem;
   width               : 100%;
-  background-color    : var(--status);
+  background-color    : var(--intent);
   animation           : toastTimeOut var(--timeout) ease-out;
   animation-fill-mode : both;
   animation-direction : normal;
@@ -191,30 +193,4 @@ toast button:hover {
   100% {
     width : 100%;
   }
-}
-
-
-toast.success {
-  --status       : var(--success);
-  --status-light : var(--success-lighter);
-}
-
-toast.info {
-  --status       : var(--info);
-  --status-light : var(--info-lighter);
-}
-
-toast.notice {
-  --status       : var(--notice);
-  --status-light : var(--notice-lighter);
-}
-
-toast.warning {
-  --status       : var(--warning);
-  --status-light : var(--warning-lighter);
-}
-
-toast.error {
-  --status       : var(--danger);
-  --status-light : var(--danger-lighter);
 }

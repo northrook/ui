@@ -125,9 +125,9 @@ final class NodeExporter
         $value = \trim( $value, " \t\n\r\0\x0B'" );
 
         if ( !stringStartsWith( $value, [ '$', 'LR\Filters' ] ) ) {
-            $value = "'{$value}'";
+            $value = '"' . $value . '"';
         }
-        return $value;
+        return $value . PHP_EOL;
     }
 
     public static function array( array $argument ) : string

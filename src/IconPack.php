@@ -22,7 +22,7 @@ final class IconPack
 
     private array $defaultAttributes = [
         'class'   => 'icon',
-        'fill'    => 'none',
+        'fill'    => 'currentColor',
         'viewbox' => '0 0 16 16',
     ];
 
