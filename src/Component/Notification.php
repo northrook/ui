@@ -73,11 +73,9 @@ class Notification extends AbstractComponent
         $type        = normalizeKey( $this->type );
         $icon        = IconPack::get( $this->type, 'notice' );
         $message     = Format::inline( $this->message );
-        $description = Format::newline( $this->description );
-
-        $description = $description ? Element::details(
+        $description = $this->description ? Element::details(
             summary    : 'Description',
-            content    : $description,
+            content    : Format::newline( $this->description ),
             attributes : [ 'class' => 'description' ],
         ) : null;
 
