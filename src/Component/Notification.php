@@ -106,7 +106,6 @@ class Notification extends AbstractComponent
 
         $content = <<<HTML
             <button class="close" aria-label="Close" type="button">
-                <i class="close"></i>
             </button>
             <output role="status">
               <i class="status">

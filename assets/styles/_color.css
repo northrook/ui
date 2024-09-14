@@ -1,4 +1,10 @@
 :root {
+
+  --color        : var(--baseline-300);
+  --background   : var(--baseline-900);
+  --shade        : var(--baseline-600);
+  --outline      : var(--baseline-500);
+
   --intent       : var(--baseline-500);
   --intent-light : var(--baseline-700);
 }

@@ -4,7 +4,8 @@
 
 toast {
   position        : relative;
-
+  display         : flex;
+  flex-direction  : column;
   max-height      : 8rem;
   min-width       : 210px;
   margin-bottom   : var(--gap);
@@ -102,24 +103,6 @@ toast.compact i.status > time {
   display : none;
 }
 
-section > toast > button.close {
-  position   : absolute;
-  top        : 0;
-  right      : 0;
-  opacity    : .25;
-  transition : opacity 200ms ease;
-}
-
-section > toast > button.close:focus-visible,
-section > toast > button.close:hover {
-  opacity : 1;
-}
-
-section > toast:focus-within > button.close,
-section > toast:hover > button.close {
-  opacity : .5;
-}
-
 toast > div.progress-bar {
   content        : '';
   position       : absolute;
@@ -140,7 +123,6 @@ toast:not(.hidden) > div.progress-bar::after {
   position            : absolute;
   right               : 0;
   bottom              : 0;
-  /*height				: 100%;*/
   height              : .125rem;
   width               : 100%;
   background-color    : var(--intent);
@@ -155,26 +137,24 @@ toast:hover:not(.hidden) > div.progress-bar::after {
   /*animation : toastTimePause var(--timeout) ease-out;*/
 }
 
-toast button.close {
+toast > button.close {
   /*background-color : orangered;*/
-  position   : absolute;
-  top        : 0;
-  right      : 0;
-  bottom     : 0;
-  width      : 1.5rem;
-  display    : flex;
-  padding    : .25rem;
-  color      : currentColor;
-  opacity    : 0.5;
-  transition : opacity 200ms ease, color 200ms ease;
+  position : absolute;
+  top      : 0;
+  right    : 0;
+  display  : flex;
+  padding  : .25rem;
 }
 
-toast:hover button {
-  opacity : 1;
+
+toast:focus-within > button.close:focus-visible,
+toast:hover > button.close:hover {
+  color : var(--danger);
 }
 
-toast button:hover {
-  color : hsla(var(--baseline-100));
+toast:focus-within > button.close,
+toast:hover > button.close {
+  color : var(--danger-light);
 }
 
 @keyframes toastTimeOut {

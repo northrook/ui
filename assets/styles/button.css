@@ -58,7 +58,7 @@ button, a.button, [type="button"], [type="submit"], [type="reset"] {
 }
 
 :where(button, a.button, [type="button"], [type="submit"], [type="reset"] ).outline::before,
-:where(button, a.button, [type="button"], [type="submit"], [type="reset"] )::after {
+:where(button, a.button, [type="button"], [type="submit"], [type="reset"] ).button::after {
   content            : '';
   position           : absolute;
   top                : 0;
@@ -73,17 +73,17 @@ button, a.button, [type="button"], [type="submit"], [type="reset"] {
 
 /* Background */
 
-:where(button, a.button, [type="button"], [type="submit"], [type="reset"] )::after {
+:where(button, a.button, [type="button"], [type="submit"], [type="reset"] ).button::after {
   z-index    : -2;
   background : var(--background);
 }
 
-:where(button, a.button, [type="button"], [type="submit"], [type="reset"] ):not(.outline)::after {
+:where(button, a.button, [type="button"], [type="submit"], [type="reset"] ).button:not(.outline)::after {
   background : var(--intent-light);
   opacity    : .5;
 }
 
-:where(button, input[type="button"], input[type="submit"], input[type="reset"]):not(.outline):where(:not(:active):hover)::after {
+:where(button, input[type="button"], input[type="submit"], input[type="reset"]).button:not(.outline):where(:not(:active):hover)::after {
   opacity : .25;
 }
 

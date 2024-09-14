@@ -72,7 +72,14 @@ final class IconPack
     <circle cx="16" cy="6" r="4" fill="currentColor"/>
   </mask>
   <circle class="theme-sun" cx="8" cy="8" r="4" mask="url(#svg-theme-moon-mask)" fill="currentColor"/>
-  <path class="theme-rays" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"        d="M8 1.33v1.34m0 10.66v1.34M3.29 3.29l.94.94m7.54 7.54.94.94M1.33 8h1.34m10.66 0h1.34M4.23 11.77l-.94.94M12.7 3.3l-.94.94"/>',
+  <path class="theme-rays" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M8 1.33v1.34m0 10.66v1.34M3.29 3.29l.94.94m7.54 7.54.94.94M1.33 8h1.34m10.66 0h1.34M4.23 11.77l-.94.94M12.7 3.3l-.94.94"/>',
+        ],
+        'user'              => [
+            'attributes' => [ 'stroke' => 'currentColor' ],
+            'svg'        => '
+  <path class="primary user" fill="none" stroke-width="1.5" d="M12 13.33a4 4 0 0 0-4-4m0 0a4 4 0 0 0-4 4m4-4A2.67 2.67 0 1 0 8 4a2.67 2.67 0 0 0 0 5.33Z"/>
+  <path class="secondary circle" fill="none" d="M8 14.67A6.67 6.67 0 1 0 8 1.33a6.67 6.67 0 0 0 0 13.34Z"/>
+  ',
         ],
     ];
 
@@ -107,12 +114,12 @@ final class IconPack
         }
 
         $attributes = $this->defaultAttributes + ( $vector[ 'attributes' ] ?? [] );
-        $svg = \trim(\preg_replace( ['#\s+#m', '#>\s<#'], [' ', '><'], $svg ));
+        $svg        = \trim( \preg_replace( [ '#\s+#m', '#>\s<#' ], [ ' ', '><' ], $svg ) );
 
         // TODO : Allow setting fill and stroke here
         $svg = new Element( 'svg', $attributes, $svg );
 
-        $svg->class( $icon);
+        $svg->class( $icon );
 
         return $asElement ? $svg : $svg->toString();
     }
