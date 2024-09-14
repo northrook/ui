@@ -39,23 +39,28 @@ class Icon extends AbstractComponent
 
     public static function nodeCompiler( NodeCompiler $node ) : AuxiliaryNode
     {
+        $attributes = $node->attributes();
+        $get        = $node->arguments()[ 'get' ] ?? $attributes[ 'get' ] ?? null;
+
+        unset( $attributes[ 'get' ] );
+
         return RenderRuntime::auxiliaryNode(
             renderName : Icon::class,
             arguments  : [
                              $node->tag( 'i', 'span' ),
-                             $node->arguments()[ 'get' ] ?? 'no match',
-                             $node->attributes(),
+                             $get,
+                             $attributes,
                          ],
         );
     }
 
     public static function runtimeRender(
-        string $component = 'icon',
-        string $get = EMPTY_STRING,
-        array  $attributes = [],
+        ?string $component = 'icon',
+        string  $get = EMPTY_STRING,
+        array   $attributes = [],
     ) : string
     {
-        return (string) new Icon( $component, $get, $attributes );
+        return (string) new Icon( $component ?? 'icon', $get, $attributes );
     }
 
 }

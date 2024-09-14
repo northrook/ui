@@ -281,8 +281,6 @@ class NodeCompiler
             }
         }
 
-        // dump( $arguments );
-
         return $arguments;
     }
 
