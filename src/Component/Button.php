@@ -21,9 +21,7 @@ class Button extends AbstractComponent
     )
     {
         $this->button = new Element( 'button', $attributes );
-        $this->button->class(
-            'button', prepend : true,
-        )->attributes->add( 'type', 'button' );
+        $this->button->attributes->add( 'type', 'button' );
     }
 
     protected function build() : string
@@ -43,7 +41,7 @@ class Button extends AbstractComponent
             }
         }
 
-        if ( !\str_starts_with( $content[ 'content' ], '<span' ) ) {
+        if ( isset( $content[ 'content' ] ) && !\str_starts_with( $content[ 'content' ], '<span' ) ) {
             $content[ 'content' ] = "<span>{$content[ 'content' ]}</span>";
         }
 

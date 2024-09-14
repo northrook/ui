@@ -36,6 +36,11 @@ abstract class AbstractComponent implements RuntimeRenderInterface
 
     private static function appendTextString( string $value, array &$content ) : void
     {
+        // Trim $value, and bail early if empty
+        if ( !$value = \trim( $value ) ) {
+            return;
+        }
+
         $lastIndex = \array_key_last( $content );
         $index     = \count( $content );
 

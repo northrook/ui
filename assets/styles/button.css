@@ -1,115 +1,15 @@
-/* input[type="file"] */
-/* @media (prefers-reduced-motion : no-preference) */
 
-/*:where(input[type="file"])::-webkit-file-upload-button {*/
-/*  --_accent-light             : hsl(210 100% 40%);*/
-/*  --_accent-dark              : hsl(210 50% 70%);*/
-/*  --_accent                   : var(--_accent-light);*/
-/*  --_text-light               : hsl(210 10% 30%);*/
-/*  --_text-dark                : hsl(210 5% 95%);*/
-/*  --_text                     : var(--_text-light);*/
-/*  --_bg-light                 : hsl(0 0% 100%);*/
-/*  --_bg-dark                  : hsl(210 9% 31%);*/
-/*  --_bg                       : var(--_bg-light);*/
-/*  --_input-well-light         : hsl(210 16% 87%);*/
-/*  --_input-well-dark          : hsl(204 10% 10%);*/
-/*  --_input-well               : var(--_input-well-light);*/
-/*  --_padding-inline           : 1.75ch;*/
-/*  --_padding-block            : .75ch;*/
-/*  --_border-radius            : .5ch;*/
-/*  --_border-light             : hsl(210 14% 89%);*/
-/*  --_border-dark              : var(--_bg-dark);*/
-/*  --_border                   : var(--_border-light);*/
-/*  --_highlight-size           : 0;*/
-/*  --_highlight-light          : hsl(210 10% 71% / 25%);*/
-/*  --_highlight-dark           : hsl(210 10% 5% / 25%);*/
-/*  --_highlight                : var(--_highlight-light);*/
-/*  --_ink-shadow-light         : 0 1px 0 var(--_border-light);*/
-/*  --_ink-shadow-dark          : 0 1px 0 hsl(210 11% 15%);*/
-/*  --_ink-shadow               : var(--_ink-shadow-light);*/
-/*  --_icon-size                : 2ch;*/
-/*  --_icon-color               : var(--_accent);*/
-/*  --_shadow-color-light       : 220 3% 15%;*/
-/*  --_shadow-color-dark        : 220 40% 2%;*/
-/*  --_shadow-color             : var(--_shadow-color-light);*/
-/*  --_shadow-strength-light    : 1%;*/
-/*  --_shadow-strength-dark     : 25%;*/
-/*  --_shadow-strength          : var(--_shadow-strength-light);*/
-/*  --_shadow-1                 : 0 1px 2px -1px hsl(var(--_shadow-color)/calc(var(--_shadow-strength) + 9%));*/
-/*  --_shadow-2                 : 0 3px 5px -2px hsl(var(--_shadow-color)/calc(var(--_shadow-strength) + 3%)), 0 7px 14px -5px hsl(var(--_shadow-color)/calc(var(--_shadow-strength) + 5%));*/
-/*  --_shadow-depth-light       : 0 1px var(--_border-light);*/
-/*  --_shadow-depth-dark        : 0 1px var(--_bg-dark);*/
-/*  --_shadow-depth             : var(--_shadow-depth-light);*/
-/*  --_transition-motion-reduce : ;*/
-/*  --_transition-motion-ok     : box-shadow 145ms ease, outline-offset 145ms ease;*/
-/*  --_transition               : var(--_transition-motion-reduce);*/
-/*  font                        : inherit;*/
-/*  letter-spacing              : inherit;*/
-/*  line-height                 : 1.5;*/
-/*  border-radius               : var(--_border-radius)*/
-/*}*/
-/*:where(button,input[type="button"],input[type="submit"],input[type="reset"],input[type="file"]), :where(input[type="file"])::file-selector-button {*/
-/*  --_accent-light             : hsl(210 100% 40%);*/
-/*  --_accent-dark              : hsl(210 50% 70%);*/
-/*  --_accent                   : var(--_accent-light);*/
-/*  --_text-light               : hsl(210 10% 30%);*/
-/*  --_text-dark                : hsl(210 5% 95%);*/
-/*  --_text                     : var(--_text-light);*/
-/*  --_bg-light                 : hsl(0 0% 100%);*/
-/*  --_bg-dark                  : hsl(210 9% 31%);*/
-/*  --_bg                       : var(--_bg-light);*/
-/*  --_input-well-light         : hsl(210 16% 87%);*/
-/*  --_input-well-dark          : hsl(204 10% 10%);*/
-/*  --_input-well               : var(--_input-well-light);*/
-/*  --_padding-inline           : 1.75ch;*/
-/*  --_padding-block            : .75ch;*/
-/*  --_border-radius            : .5ch;*/
-/*  --_border-light             : hsl(210 14% 89%);*/
-/*  --_border-dark              : var(--_bg-dark);*/
-/*  --_border                   : var(--_border-light);*/
-/*  --_highlight-size           : 0;*/
-/*  --_highlight-light          : hsl(210 10% 71% / 25%);*/
-/*  --_highlight-dark           : hsl(210 10% 5% / 25%);*/
-/*  --_highlight                : var(--_highlight-light);*/
-/*  --_ink-shadow-light         : 0 1px 0 var(--_border-light);*/
-/*  --_ink-shadow-dark          : 0 1px 0 hsl(210 11% 15%);*/
-/*  --_ink-shadow               : var(--_ink-shadow-light);*/
-/*  --_icon-size                : 2ch;*/
-/*  --_icon-color               : var(--_accent);*/
-/*  --_shadow-color-light       : 220 3% 15%;*/
-/*  --_shadow-color-dark        : 220 40% 2%;*/
-/*  --_shadow-color             : var(--_shadow-color-light);*/
-/*  --_shadow-strength-light    : 1%;*/
-/*  --_shadow-strength-dark     : 25%;*/
-/*  --_shadow-strength          : var(--_shadow-strength-light);*/
-/*  --_shadow-1                 : 0 1px 2px -1px hsl(var(--_shadow-color)/calc(var(--_shadow-strength) + 9%));*/
-/*  --_shadow-2                 : 0 3px 5px -2px hsl(var(--_shadow-color)/calc(var(--_shadow-strength) + 3%)), 0 7px 14px -5px hsl(var(--_shadow-color)/calc(var(--_shadow-strength) + 5%));*/
-/*  --_shadow-depth-light       : 0 1px var(--_border-light);*/
-/*  --_shadow-depth-dark        : 0 1px var(--_bg-dark);*/
-/*  --_shadow-depth             : var(--_shadow-depth-light);*/
-/*  --_transition-motion-reduce : ;*/
-/*  --_transition-motion-ok     : box-shadow 145ms ease, outline-offset 145ms ease;*/
-/*  --_transition               : var(--_transition-motion-reduce);*/
-/*  font                        : inherit;*/
-/*  letter-spacing              : inherit;*/
-/*  line-height                 : 1.5;*/
-/*  border-radius               : var(--_border-radius)*/
-/*} */
-
-/*:root {*/
-/*  --prefers-reduced-transition : ;*/
-/*  --prefers-transition          : var(--prefers-reduced-transition);*/
-/*}*/
-
-/*@media (prefers-reduced-motion : no-preference) {*/
-/*  :root {*/
-/*    --prefers-transition : var(--transition);*/
-/*  }*/
-/*}*/
+:where( button, a, [type="button"], [type="submit"], [type="reset"]).button {
+  gap                         : .75ch;
+  padding-block               : .5ch;
+  padding-inline              : .75ch;
+  box-shadow    : 0 2px 6px -2px var(--shadow), 0 2px 1.25em -5px var(--shadow-light);
+  border-radius : .2em;
+}
 
 button, a.button, [type="button"], [type="submit"], [type="reset"] {
 
-  --transition                : color 145ms ease, outline-offset 145ms ease;
+  --transition                : opacity 145ms ease, outline-offset 145ms ease;
 
   /* Interaction */
   cursor                      : pointer;
@@ -122,26 +22,18 @@ button, a.button, [type="button"], [type="submit"], [type="reset"] {
   -webkit-touch-callout       : none;
 
   /* Box */
+  z-index                     : 15;
   position                    : relative;
   display                     : inline-flex;
   justify-content             : center;
   align-items                 : center;
   text-align                  : center;
-  gap                         : .75ch;
-  padding-block               : .5ch;
-  padding-inline              : .75ch;
-  background                  : var(--background);
-  box-shadow                  : 0 2px 6px -2px var(--shadow), 0 2px 1.25em -5px var(--shadow-light);
-  border-radius               : .2em;
 
   /* Font */
   font-size                   : var(--font-size, 1rem);
   font-weight                 : var(--font-regular);
   color                       : var(--color);
 
-  /* Animation */
-  -webkit-transition          : var(--transition);
-  transition                  : var(--transition);
 }
 
 /* Button Icon */
@@ -156,23 +48,47 @@ button, a.button, [type="button"], [type="submit"], [type="reset"] {
   line-height         : 1.5rem;
 }
 
+/* Background / Outline */
+
 /* Outline */
-:where(button, a.button, [type="button"], [type="submit"], [type="reset"] )::before {
+:where(button, a.button, [type="button"], [type="submit"], [type="reset"] ).outline::before {
+  z-index        : -5;
+  outline        : .75ch solid var(--intent-light);
+  outline-offset : -.75ch;
+}
+
+:where(button, a.button, [type="button"], [type="submit"], [type="reset"] ).outline::before,
+:where(button, a.button, [type="button"], [type="submit"], [type="reset"] )::after {
   content            : '';
-  z-index            : -5;
   position           : absolute;
   top                : 0;
   right              : 0;
   bottom             : 0;
   left               : 0;
   border-radius      : inherit;
-  -webkit-transition : outline-offset 145ms ease;
-  transition         : outline-offset 145ms ease;
-  outline            : .75ch solid var(--intent-light);
-  outline-offset     : -.75ch;
+  /* Animation */
+  -webkit-transition : var(--transition);
+  transition         : var(--transition);
 }
 
-:where(button, input[type="button"], input[type="submit"], input[type="reset"]):where(:not(:active):hover)::before {
+/* Background */
+
+:where(button, a.button, [type="button"], [type="submit"], [type="reset"] )::after {
+  z-index    : -2;
+  background : var(--background);
+}
+
+:where(button, a.button, [type="button"], [type="submit"], [type="reset"] ):not(.outline)::after {
+  background : var(--intent-light);
+  opacity    : .5;
+}
+
+:where(button, input[type="button"], input[type="submit"], input[type="reset"]):not(.outline):where(:not(:active):hover)::after {
+  opacity : .25;
+}
+
+
+:where(button, input[type="button"], input[type="submit"], input[type="reset"]).outline:where(:not(:active):hover)::before {
   outline-offset : 0;
 }
 

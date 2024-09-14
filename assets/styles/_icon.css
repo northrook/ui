@@ -1,23 +1,23 @@
-.icon {
+svg.icon {
   height: 1rem;
   width: 1rem;
 }
-.icon[direction=up] {
+svg.icon[direction=up] {
   rotate: 0deg;
 }
-.icon[direction=right] {
+svg.icon[direction=right] {
   rotate: 90deg;
 }
-.icon[direction=down] {
+svg.icon[direction=down] {
   rotate: 180deg;
 }
-.icon[direction=left] {
+svg.icon[direction=left] {
   rotate: 270deg;
 }
 
-.icon path.primary {
+svg.icon path.primary {
   color: orange;
 }
-.icon path.secondary {
+svg.icon path.secondary {
   color: blue;
 }

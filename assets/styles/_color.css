@@ -20,7 +20,7 @@
 
 .intent\:notice {
   --intent       : var(--notice);
-  --intent-light : var(--notice-lighter);
+  --intent-light : var(--notice-light);
 }
 
 .intent\:warning {
@@ -30,5 +30,5 @@
 
 .intent\:danger {
   --intent       : var(--danger);
-  --intent-light : var(--danger-lighter);
+  --intent-light : var(--danger-light);
 }

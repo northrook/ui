@@ -69,9 +69,13 @@ final class RenderRuntime
         ?int   $cache = AUTO,
     ) : ?string
     {
+
         if ( !$this->validate( $className ) ) {
             return null;
         }
+
+        // DEBUGGING
+        $cache = DISABLED;
 
         $this::registerInvocation( $className );
 
