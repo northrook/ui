@@ -1,15 +1,17 @@
 :root {
-
   --color        : var(--baseline-300);
   --background   : var(--baseline-900);
   --shade        : var(--baseline-600);
   --outline      : var(--baseline-500);
-
   --intent       : var(--baseline-500);
   --intent-light : var(--baseline-700);
+
+  --accent       : var(--primary-500);
+  --accent-light : var(--primary-600);
 }
 
 .intent\:primary {
+  --intent-dark  : var(--primary-400);
   --intent       : var(--primary-500);
   --intent-light : var(--primary-600);
 }
@@ -21,7 +23,7 @@
 
 .intent\:info {
   --intent       : var(--info);
-  --intent-light : var(--info-lighter);
+  --intent-light : var(--info-light);
 }
 
 .intent\:notice {

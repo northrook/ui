@@ -71,7 +71,7 @@ toast i.status {
 toast i.status svg.icon {
   height    : 1rem;
   width     : 1rem;
-  translate : 0 -.125em;
+  translate : 0 -.063em;
   color     : var(--intent);
 }
 

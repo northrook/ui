@@ -1,23 +1,16 @@
 svg.icon {
-  height: 1rem;
-  width: 1rem;
+  height : var(--size, 1em);
+  width  : var(--size, 1em);
 }
 svg.icon[direction=up] {
-  rotate: 0deg;
+  rotate : 0deg;
 }
 svg.icon[direction=right] {
-  rotate: 90deg;
+  rotate : 90deg;
 }
 svg.icon[direction=down] {
-  rotate: 180deg;
+  rotate : 180deg;
 }
 svg.icon[direction=left] {
-  rotate: 270deg;
-}
-
-svg.icon path.primary {
-  color: orange;
-}
-svg.icon path.secondary {
-  color: blue;
+  rotate : 270deg;
 }
