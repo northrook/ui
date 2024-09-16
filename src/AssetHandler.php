@@ -2,8 +2,8 @@
 
 namespace Northrook\UI;
 
-use Northrook\Asset\Script;
-use Northrook\Asset\Style;
+use Northrook\Assets\Script;
+use Northrook\Assets\Style;
 use Northrook\Resource\Path;
 use function Northrook\normalizePath;
 
@@ -17,17 +17,20 @@ final class AssetHandler
 
     public function __construct(
         string | array $assetDirectories = [],
-    ) {
+    )
+    {
         $this->addDirectory( $assetDirectories );
     }
 
-    public static function register( string $name, string $component ) : void {
+    public static function register( string $name, string $component ) : void
+    {
         if ( !isset( AssetHandler::$calledComponents[ $name ] ) ) {
             AssetHandler::$calledComponents[ $name ] = $component;
         }
     }
 
-    private function addDirectory( string | array $directory ) : void {
+    private function addDirectory( string | array $directory ) : void
+    {
         foreach ( (array) $directory as $file ) {
             if ( !\is_dir( $file ) ) {
                 continue;
@@ -36,12 +39,11 @@ final class AssetHandler
         }
     }
 
-    public function getComponentAssets( array $filter = [] ) : array {
-
+    public function getComponentAssets( array $filter = [] ) : array
+    {
         $assets = [];
 
         foreach ( RenderRuntime::getCalledInvocations() as $className => $component ) {
-
             if ( !\method_exists( $className, 'getAssets' ) ) {
                 continue;
             }
@@ -55,13 +57,15 @@ final class AssetHandler
             foreach ( $className::getAssets() as $asset ) {
                 $asset = new Path( $asset );
 
-                if ( ! $asset->exists ) {
+                if ( !$asset->exists ) {
                     continue;
                 }
 
+                $id = 'ui:' . \strtolower( $component );
+
                 $assets[] = match ( $asset->extension ) {
-                    'css'   => new Style( $asset, [ 'component' => $component ] ),
-                    'js'    => new Script( $asset, [ 'component' => $component ] ),
+                    'css'   => new Style( $asset, $id ),
+                    'js'    => new Script( $asset, $id ),
                     default => $asset,
                 };
             }

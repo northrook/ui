@@ -12,6 +12,7 @@
 .env
 *.lock
 /public
+/assets
 /var
 /templates
 /_dev
