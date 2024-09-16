@@ -58,4 +58,4 @@ function notification() {
 	} );
 }
 
-App.on.ContentLoaded( notification );
+App.event.ContentLoaded( notification );
