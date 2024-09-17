@@ -113,7 +113,7 @@ final class NodeExporter
             $export[] = $argument;
         }
 
-        $string = \implode( ', ' . PHP_EOL, $export ) . PHP_EOL;
+        $string = PHP_EOL . \implode( ', ' . PHP_EOL, $export ) . PHP_EOL;
 
         // dump( $export );
 
@@ -127,7 +127,7 @@ final class NodeExporter
         if ( !stringStartsWith( $value, [ '$', 'LR\Filters' ] ) ) {
             $value = '"' . $value . '"';
         }
-        return $value . PHP_EOL;
+        return $value;
     }
 
     public static function array( array $argument ) : string

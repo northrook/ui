@@ -56,9 +56,10 @@ class Breadcrumbs extends AbstractComponent
                                $trail,
                                Element::meta( property : 'position', content : $index + 1 ),
                            ],
-                class    : $item->classes,
-                property : 'itemListElement',
-                typeof   : 'ListItem',
+                attributes : [
+                               $item->classes,
+                               'itemListElement',
+                               'ListItem',]
             )->toString();
         }
 

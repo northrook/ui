@@ -4,45 +4,55 @@ namespace Northrook\UI\Component;
 
 use Latte\Compiler\Node;
 use Northrook\HTML\Element;
+use Northrook\UI\Model;
 use Northrook\UI\Compiler\AbstractComponent;
 use Northrook\UI\Compiler\NodeCompiler;
+use Northrook\UI\Component\Menu\MenuBuilderTrait;
 use Northrook\UI\RenderRuntime;
 
 
+/**
+ * @internal
+ */
 class Menu extends AbstractComponent
 {
 
-    private readonly ?Element $list;
-
     public function __construct(
-        private array            $items = [],
-        private readonly array   $attributes = [],
-        private readonly ?string $parent = null,
-    )
-    {
-        $this->list = new Element( 'ol', [ 'class' => 'navigation' ] );
-    }
+        private readonly null | string | Model\Menu $menu,
+        private array                               $attributes = [],
+        private readonly ?string                    $tag = null,
+    ) {}
 
     protected function build() : string
     {
-        $menu = new Element( 'ul', [ 'class' => 'navigation' ], '[Menu here.]' );
-        if ( $this->parent ) {
-            return (string) new Element( $this->parent, $this->attributes, $menu );
+        if ( !isset( $this->attributes[ 'class' ] ) ) {
+            $this->attributes[ 'class' ] = 'navigation';
         }
-        $menu->attributes->set( $this->attributes );
+        else {
+            $this->attributes[ 'class' ] .= 'navigation ' . $this->attributes[ 'class' ];
+        }
+        if ( $this->tag ) {
+            return ( string) new Element( $this->tag, $this->attributes, $this->menu->render() );
+        }
+
+        if ( $this->menu instanceof Model\Menu ) {
+            return (string) $this->menu->render( $this->attributes );
+        }
+
+        $menu = new Element( 'ul', $this->attributes, $this->menu );
         return (string) $menu;
     }
 
     public static function nodeCompiler( NodeCompiler $node ) : Node
     {
-        $arguments = $node->arguments();
-        // $items     = \array_shift( $arguments );
-        // dump( $node,$arguments );
+        $arguments    = $node->arguments();
+        $menuVariable = \array_shift( $arguments );
+        // dump( $menuVariable, $arguments );
 
         return RenderRuntime::auxiliaryNode(
             renderName : Menu::class,
             arguments  : [
-                             $node->arguments(),
+                             $menuVariable,
                              $node->attributes(),
                              $node->tag( 'nav' ),
                          ],
@@ -50,9 +60,9 @@ class Menu extends AbstractComponent
     }
 
     public static function runtimeRender(
-        array   $items = [],
-        array   $attributes = [],
-        ?string $parent = null,
+        null | string | Model\Menu $items = null,
+        array                      $attributes = [],
+        ?string                    $parent = null,
     ) : string
     {
         return (string) new Menu( $items, $attributes, $parent );

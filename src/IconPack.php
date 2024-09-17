@@ -14,6 +14,13 @@ final class IconPack
 
 
     private const array DEFAULT = [
+        'chevron'           => [
+            'attributes' => [
+                'fill'   => 'none',
+                'stroke' => 'currentColor',
+            ],
+            'svg'        => '<path stroke-linecap="round" stroke-linejoin="round" d="M12 10 8 6l-4 4"/>',
+        ],
         'arrow'             => [
             'attributes' => [ 'stroke' => 'currentColor' ],
             'svg'        => '<path class="primary" stroke-linecap="round" stroke-linejoin="round" d="M8 12.5v-9m0 0-4 4m4-4 4 4"/>',
@@ -77,10 +84,69 @@ final class IconPack
         'user'              => [
             'attributes' => [ 'stroke' => 'currentColor' ],
             'svg'        => '
-  <path class="primary user" fill="none" stroke-width="1.5" d="M12 13.33a4 4 0 0 0-4-4m0 0a4 4 0 0 0-4 4m4-4A2.67 2.67 0 1 0 8 4a2.67 2.67 0 0 0 0 5.33Z"/>
+  <path class="primary user" fill="none" stroke-width="1.25" d="M12 13.33a4 4 0 0 0-4-4m0 0a4 4 0 0 0-4 4m4-4A2.67 2.67 0 1 0 8 4a2.67 2.67 0 0 0 0 5.33Z"/>
   <path class="secondary circle" fill="none" d="M8 14.67A6.67 6.67 0 1 0 8 1.33a6.67 6.67 0 0 0 0 13.34Z"/>
   ',
         ],
+        'ui:toggle'         => [
+            'attributes' => [
+                'fill'   => 'none',
+                'stroke' => 'currentColor',
+            ],
+            // 'svg'        => '<path stroke-linecap="round" stroke-linejoin="round" d="M12 10 8 6l-4 4"/>',
+            'svg'        => '<path d="M12 10 8 6l-4 4"/><path d="M12 8H4"/>',
+            // '<path stroke="black" stroke-linecap="round" stroke-linejoin="round" d="M12 8H4"/>'
+        ],
+        'ui:dashboard'      => [
+            'attributes' => [
+                'fill'   => 'none',
+                'stroke' => 'currentColor',
+            ],
+            'svg'        => '<path stroke-linecap="round" stroke-linejoin="round" d="M13.33 2H2.67C2.3 2 2 2.3 2 2.67V6c0 .37.3.67.67.67h10.66c.37 0 .67-.3.67-.67V2.67c0-.37-.3-.67-.67-.67Z"/><path stroke="black" stroke-linecap="round" stroke-linejoin="round" d="M6 9.33H2.67c-.37 0-.67.3-.67.67v3.33c0 .37.3.67.67.67H6c.37 0 .67-.3.67-.67V10c0-.37-.3-.67-.67-.67Z"/><path stroke="black" stroke-linecap="round" stroke-linejoin="round" d="M13.33 9.33H10c-.37 0-.67.3-.67.67v3.33c0 .37.3.67.67.67h3.33c.37 0 .67-.3.67-.67V10c0-.37-.3-.67-.67-.67Z"/>',
+        ],
+        'ui:layers'         => [
+            'attributes' => [
+                'fill'   => 'none',
+                'stroke' => 'currentColor',
+            ],
+            'svg'        => '<path d="M8.55 1.45a1.33 1.33 0 0 0-1.1 0l-5.72 2.6a.67.67 0 0 0 0 1.22l5.72 2.61a1.33 1.33 0 0 0 1.11 0l5.72-2.6a.67.67 0 0 0 0-1.22l-5.73-2.6Z"/><path d="m14.67 8.43-6.12 2.78a1.33 1.33 0 0 1-1.1 0L1.33 8.43"/><path d="m14.67 11.77-6.12 2.77a1.33 1.33 0 0 1-1.1 0l-6.12-2.77"/>',
+        ],
+        'ui:bar-chart'      => [
+            'attributes' => [
+                'fill'            => 'none',
+                'stroke'          => 'currentColor',
+                'stroke-width'    => 1,
+                'stroke-linecap'  => "round",
+                'stroke-linejoin' => "round",
+            ],
+            'svg'        => '<path d="M4 14V10"/><path d="M8 14V8"/><path d="M12 14V6"/>',
+        ],
+        'ui:hex-bolt'       => [
+            'attributes' => [
+                'fill'            => 'none',
+                'stroke'          => 'currentColor',
+                'stroke-width'    => 1,
+                'stroke-linecap'  => "round",
+                'stroke-linejoin' => "round",
+            ],
+            'svg'        => '<path d="m5.75 6.4 2-1.17a.5.5 0 0 1 .5 0l2 1.16a.5.5 0 0 1 .25.43v2.36a.5.5 0 0 1-.25.43l-2 1.16a.5.5 0 0 1-.5 0l-2-1.16a.5.5 0 0 1-.25-.43V6.82c0-.17.1-.34.25-.43Z"/><path d="M7 1.59 3 3.92a2 2 0 0 0-1 1.73v4.7a2 2 0 0 0 1 1.73l4 2.33a2 2 0 0 0 2 0l4-2.33a2 2 0 0 0 1-1.73v-4.7a2 2 0 0 0-1-1.73L9 1.6a2 2 0 0 0-2 0Z"/>
+',
+        ],
+        'ui:settings'       => [
+            'attributes' => [
+                'fill'            => 'none',
+                'stroke'          => 'currentColor',
+                'stroke-width'    => 1,
+                'stroke-linecap'  => "round",
+                'stroke-linejoin' => "round",
+            ],
+            'svg'        => '
+<path class="primary" d="M4.67 6.67a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/>
+<path class="primary" d="M11.33 13.33a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/>
+<path class="secondary" d="M13.33 4.67h-6"/>
+<path class="secondary" d="M9.33 11.33h-6"/>',
+        ],
+
     ];
 
     private array $defaultAttributes = [
@@ -102,6 +168,16 @@ final class IconPack
 
     public function getIcon( string $icon, ?string $fallback, bool $asElement = false ) : null | string | Element
     {
+        $attributes = $this->defaultAttributes;
+
+        if ( \str_contains( $icon, '[' ) ) {
+            [ $icon, $data ] = explode( '[', $icon, 2 );
+            $data = \trim( $data, " \n\r\t\v\0[]" );
+            if ( !\str_contains( $data, '=' ) ) {
+                $attributes[ 'direction' ] = $data;
+            }
+        }
+
         $vector = $this->resolveIconAsset( $icon )
                   ?? IconPack::DEFAULT[ $icon ]
                      ?? IconPack::DEFAULT[ $fallback ]
@@ -113,7 +189,7 @@ final class IconPack
             return null;
         }
 
-        $attributes = $this->defaultAttributes + ( $vector[ 'attributes' ] ?? [] );
+        $attributes += ( $vector[ 'attributes' ] ?? [] );
         $svg        = \trim( \preg_replace( [ '#\s+#m', '#>\s<#' ], [ ' ', '><' ], $svg ) );
 
         // TODO : Allow setting fill and stroke here
