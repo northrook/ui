@@ -2,9 +2,11 @@
 
 namespace Northrook\UI\Model;
 
+use JetBrains\PhpStorm\Language;
 use Northrook\HTML\Element;
 use Northrook\UI\Model\Menu\Item;
 use function Northrook\normalizeKey;
+use function Northrook\normalizeUrl;
 use const Northrook\EMPTY_STRING;
 
 
@@ -41,20 +43,24 @@ class Menu implements \Stringable
 
     public array $items = [];
 
+    public readonly string  $name;
+    public readonly string  $root;
     public readonly ?string $id;
 
     public function __construct(
-        public readonly string  $root,
-        public readonly ?string $current = null,
-        null | string | false   $id = null,
-        private array           $attributes = [],
+            string                  $name,
+            string                  $root,
+            public readonly ?string $current = null,
+            null | string | false   $id = null,
+            private array           $attributes = [],
     )
     {
-        if ( $id !== false ) {
-            $this->id = normalizeKey( $id ?? $this->root );
-        }
-        else {
-            $this->id = null;
+        $this->name = normalizeKey( $name );
+        $this->root = normalizeUrl( $root );
+        $this->id   = $id !== false ? normalizeKey( $id ?? $this->name ) : null;
+
+        if ( $this->id ) {
+            $this->attributes[ 'id' ] = $this->id;
         }
     }
 
@@ -67,46 +73,51 @@ class Menu implements \Stringable
         return $this;
     }
 
+    public static function html(
+            #[Language( 'HTML' )]
+            string $html,
+    ) : void {}
+
     public static function link(
-        string         $title,
-        string         $href,
-        string | false $icon = false,
-        ?string        $description = null,
-        ?string        $id = null,
-        bool           $render = true,
-        array          $attributes = [],
+            string         $title,
+            string         $href,
+            string | false $icon = false,
+            ?string        $description = null,
+            ?string        $id = null,
+            bool           $render = true,
+            array          $attributes = [],
     ) : Item
     {
         return new Item(
-            title       : $title,
-            href        : $href,
-            icon        : $icon,
-            description : $description,
-            id          : $id,
-            canRender   : $render,
-            attributes  : $attributes,
+                title       : $title,
+                href        : $href,
+                icon        : $icon,
+                description : $description,
+                id          : $id,
+                canRender   : $render,
+                attributes  : $attributes,
         );
     }
 
     public static function item(
-        string         $title,
-        ?string        $href = null,
-        string | false $icon = false,
-        ?string        $description = null,
-        ?string        $id = null,
-        bool           $render = true,
-        array          $attributes = [],
+            string         $title,
+            ?string        $href = null,
+            string | false $icon = false,
+            ?string        $description = null,
+            ?string        $id = null,
+            bool           $render = true,
+            array          $attributes = [],
     ) : Item
     {
         return new Item(
-            title       : $title,
-            href        : $href,
-            icon        : $icon,
-            description : $description,
-            id          : $id,
-            isLink      : false,
-            canRender   : $render,
-            attributes  : $attributes,
+                title       : $title,
+                href        : $href,
+                icon        : $icon,
+                description : $description,
+                id          : $id,
+                isLink      : false,
+                canRender   : $render,
+                attributes  : $attributes,
         );
     }
 
@@ -119,8 +130,7 @@ class Menu implements \Stringable
         }
 
         $element = new Element( $tag, $this->attributes, $render );
-        $element->id( $this->id )
-            ->attributes->merge( $attributes );
+        $element->attributes->merge( $attributes );
 
         return $element->toString( PHP_EOL );
     }
