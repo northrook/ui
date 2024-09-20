@@ -22,8 +22,8 @@ final class PrintedNode implements \Stringable
     public readonly ?string $expression;
 
     public function __construct(
-        private readonly Node $node,
-        private ?PrintContext $context = null,
+            private readonly Node $node,
+            private ?PrintContext $context = null,
     )
     {
         $this->context ??= new PrintContext();
@@ -42,10 +42,13 @@ final class PrintedNode implements \Stringable
 
     private function parsePrintNode() : void
     {
-        $this->value        = \trim( \preg_replace( '#echo (.+) /\*.+?;#', "$1 ", $this->print() ) );
+        $this->value = \trim( \preg_replace( '#echo (.+) /\*.+?;#', "$1 ", $this->print() ) );
         // dump( $this->value );
-        $this->variable     = pregExtract( '#\$(\w+)(?=\s|:|\?|$)#', $this->value );
-        $this->expression     = pregExtract( '#\$(.+?)(?=\)|$)#', $this->value );
+
+        // We may want to capture the whole {$variable ?: $withAny ?? [$rules]}
+        // Parse and ensure it has a null-coalescing fallback
+        $this->variable     = pregExtract( '#\$(\w+)(?=\s*|:|\?|$)#', $this->value );
+        $this->expression   = pregExtract( '#\$(.+?)(?=\)|$)#', $this->value );
         $this->isExpression = true;
     }
 
