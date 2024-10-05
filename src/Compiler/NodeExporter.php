@@ -1,13 +1,12 @@
 <?php
 
-declare( strict_types = 1 );
+declare(strict_types=1);
 
 namespace Northrook\UI\Compiler;
 
-use Symfony\Component\VarExporter\VarExporter;
-use function Northrook\stringStartsWith;
-use const Northrook\{EMPTY_STRING, WHITESPACE};
-
+use Support\Str;
+use Stringable;
+use const Support\{EMPTY_STRING};
 
 final class NodeExporter
 {
@@ -16,8 +15,8 @@ final class NodeExporter
     public function __construct() {}
 
     /**
-     * @param class-string  $class
-     * @param               ...$arguments
+     * @param class-string $class
+     * @param              ...$arguments
      *
      * @return $this
      */
@@ -26,14 +25,13 @@ final class NodeExporter
         return $this
             ->append( '( new ', $class, '( ' )
             ->handleCallArguments( $arguments )
-            ->append( ' ))' )
-        ;
+            ->append( ' ))' );
     }
 
     /**
-     * @param class-string     $class
-     * @param callable-string  $method
-     * @param                  ...$args
+     * @param class-string    $class
+     * @param callable-string $method
+     * @param                 ...$args
      *
      * @return $this
      */
@@ -49,7 +47,7 @@ final class NodeExporter
 
     public function toEcho() : string
     {
-        return 'echo ' . $this->getValue() . ';';
+        return 'echo '.$this->getValue().';';
     }
 
     public function append( string ...$value ) : NodeExporter
@@ -62,7 +60,7 @@ final class NodeExporter
 
     public function prepend( string $value ) : NodeExporter
     {
-        $this->value = $value . $this->value;
+        $this->value = $value.$this->value;
         return $this;
     }
 
@@ -70,27 +68,28 @@ final class NodeExporter
     {
         foreach ( $arguments as $name => $argument ) {
             if ( \is_string( $name ) ) {
-                $this->append( "$name: " );
+                $this->append( "{$name}: " );
             }
-            $this->append( $this->handleArgument( $argument ), ", " );
+            $this->append( $this->handleArgument( $argument ), ', ' );
         }
         return $this;
     }
 
     private function handleArgument( mixed $argument ) : string
     {
-        if ( \is_string( $argument ) || $argument instanceof \Stringable ) {
+        if ( \is_string( $argument ) || $argument instanceof Stringable ) {
             return (string) "'{$argument}'";
         }
 
         if ( \is_array( $argument ) && \array_filter( $argument, 'is_string' ) ) {
             $string = '[ ';
+
             foreach ( $argument as $key => $value ) {
-                $key    = \trim( $key, " \t\n\r\0\x0B'" );
-                $value  = \trim( $value, " \t\n\r\0\x0B'" );
+                $key   = \trim( $key, " \t\n\r\0\x0B'" );
+                $value = \trim( $value, " \t\n\r\0\x0B'" );
                 $string .= "'{$key}' => '{$value}', ";
             }
-            return $string .= "]";
+            return $string .= ']';
         }
 
         return __FUNCTION__;
@@ -103,7 +102,7 @@ final class NodeExporter
         // dump( $arguments );
 
         foreach ( $arguments as $name => $value ) {
-            $argument = \is_string( $name ) ? "'$name' =>" : '';
+            $argument = \is_string( $name ) ? "'{$name}' =>" : '';
             $argument .= match ( \gettype( $value ) ) {
                 'string'  => self::string( $value ),
                 'array'   => self::array( $value ),
@@ -113,19 +112,19 @@ final class NodeExporter
             $export[] = $argument;
         }
 
-        $string = PHP_EOL . \implode( ', ' . PHP_EOL, $export ) . PHP_EOL;
+        $string = PHP_EOL.\implode( ', '.PHP_EOL, $export ).PHP_EOL;
 
         // dump( $export );
 
-        return "[ $string ]";
+        return "[ {$string} ]";
     }
 
     public static function string( string $value ) : string
     {
         $value = \trim( $value, " \t\n\r\0\x0B'" );
 
-        if ( !stringStartsWith( $value, [ '$', 'LR\Filters' ] ) ) {
-            $value = '"' . $value . '"';
+        if ( ! Str::startsWith( $value, ['$', 'LR\Filters'] ) ) {
+            $value = '"'.$value.'"';
         }
         return $value;
     }
@@ -135,13 +134,14 @@ final class NodeExporter
         // dump( $argument );
 
         if ( empty( $argument ) ) {
-            return "[]";
+            return '[]';
         }
 
-        $string = '[' . PHP_EOL;
+        $string = '['.PHP_EOL;
+
         foreach ( $argument as $key => $value ) {
             if ( \is_string( $key ) ) {
-                $key = "'" . \trim( $key, " \t\n\r\0\x0B'" ) . "'";
+                $key = "'".\trim( $key, " \t\n\r\0\x0B'" )."'";
             }
 
             if ( \is_string( $value ) ) {
@@ -152,10 +152,10 @@ final class NodeExporter
                 $value = self::array( $value );
             }
 
-            $string .= "$key => $value," . PHP_EOL;
+            $string .= "{$key} => {$value},".PHP_EOL;
         }
 
-        return $string .= "]";
+        return $string .= ']';
     }
 
     public static function boolean( bool $bool ) : string
@@ -165,19 +165,19 @@ final class NodeExporter
 
     public static function integer( ?int $int ) : string
     {
-        return $int === null ? 'null' : (string) $int;
+        return null === $int ? 'null' : (string) $int;
     }
 
     public static function cacheConstant( ?int $cache ) : string
     {
         static $runtimeCache;
-        $runtimeCache[ 'constants' ] ??= \array_filter(
-            \get_defined_constants( true )[ 'user' ],
-            static fn( $key ) => \str_starts_with( $key, "Cache" ),
+        $runtimeCache['constants'] ??= \array_filter(
+            \get_defined_constants( true )['user'],
+            static fn( $key ) => \str_starts_with( $key, 'Cache' ),
             ARRAY_FILTER_USE_KEY,
         );
 
-        return (string) $runtimeCache[ $cache ]
-            ??= \array_search( $cache, $runtimeCache[ 'constants' ], true ) ?: $cache;
+        return (string) $runtimeCache[$cache]
+            ??= \array_search( $cache, $runtimeCache['constants'], true ) ?: $cache;
     }
 }

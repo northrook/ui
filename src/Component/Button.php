@@ -4,11 +4,9 @@ namespace Northrook\UI\Component;
 
 use Latte\Compiler\Nodes\AuxiliaryNode;
 use Northrook\HTML\Element;
-use Northrook\UI\Compiler\AbstractComponent;
-use Northrook\UI\Compiler\NodeCompiler;
+use Northrook\UI\Compiler\{AbstractComponent, NodeCompiler};
 use Northrook\UI\Component\Button\Type;
 use Northrook\UI\RenderRuntime;
-
 
 class Button extends AbstractComponent
 {
@@ -18,8 +16,7 @@ class Button extends AbstractComponent
         protected readonly Type $type = Type::Button,
         array                   $attributes = [],
         private array           $content = [],
-    )
-    {
+    ) {
         $this->button = new Element( 'button', $attributes );
         $this->button->attributes->add( 'type', 'button' );
     }
@@ -27,27 +24,29 @@ class Button extends AbstractComponent
     protected function build() : string
     {
         $content = [];
+
         foreach ( $this->content as $index => $html ) {
             if ( \str_starts_with( $index, 'icon' ) ) {
-                $content[ 'icon' ] = $html;
+                $content['icon'] = $html;
+
                 continue;
             }
 
-            if ( isset( $content[ 'content' ] ) ) {
-                $content[ 'content' ] .= " $html";
+            if ( isset( $content['content'] ) ) {
+                $content['content'] .= " {$html}";
             }
             else {
-                $content[ 'content' ] = $html;
+                $content['content'] = $html;
             }
         }
 
-        if ( isset( $content[ 'content' ] ) && !\str_starts_with( $content[ 'content' ], '<span' ) ) {
-            $content[ 'content' ] = "<span>{$content[ 'content' ]}</span>";
+        if ( isset( $content['content'] ) && ! \str_starts_with( $content['content'], '<span' ) ) {
+            $content['content'] = "<span>{$content['content']}</span>";
         }
 
         $this->button->content( $content );
 
-        return ( string ) $this->button;
+        return (string) $this->button;
     }
 
     public static function nodeCompiler( NodeCompiler $node ) : AuxiliaryNode
@@ -55,10 +54,10 @@ class Button extends AbstractComponent
         return RenderRuntime::auxiliaryNode(
             renderName : Button::class,
             arguments  : [
-                             'button',
-                             $node->attributes(),
-                             $node->parseContent(),
-                         ],
+                'button',
+                $node->attributes(),
+                $node->parseContent(),
+            ],
         );
     }
 
@@ -66,8 +65,7 @@ class Button extends AbstractComponent
         string $type = 'button',
         array  $attributes = [],
         array  $content = [],
-    ) : string
-    {
+    ) : string {
         return (string) new Button(
             Type::from( $type ),
             $attributes,

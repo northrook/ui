@@ -1,21 +1,18 @@
 <?php
 
-declare( strict_types = 1 );
+declare(strict_types=1);
 
 namespace Northrook\UI\Component;
 
 use Latte\Compiler\Node;
 use Northrook\HTML\Element;
 use Northrook\Logger\Log;
-use Northrook\UI\Compiler\AbstractComponent;
-use Northrook\UI\Compiler\NodeCompiler;
+use Northrook\UI\Compiler\{AbstractComponent, NodeCompiler};
 use Northrook\UI\RenderRuntime;
+use Support\Str;
 use Tempest\Highlight\Highlighter;
-use function Northrook\replaceEach;
-use const Northrook\EMPTY_STRING;
-use const Northrook\WHITESPACE;
 
-
+use const Support\{EMPTY_STRING, WHITESPACE};
 // TODO : Copy-to-clipboard integration - toggle via attr copyToClipboard="true/false|line"
 //        Block will enable this by default, inline will not.
 //        Allow copy whole block, and line-by-line
@@ -24,7 +21,7 @@ class Code extends AbstractComponent
 {
     protected const string
         INLINE = 'inline',
-        BLOCK = 'block';
+        BLOCK  = 'block';
 
     protected readonly Element $component;
 
@@ -34,9 +31,8 @@ class Code extends AbstractComponent
         private ?string          $type = null,
         private readonly bool    $tidyCode = true,
         array                    $attributes = [],
-    )
-    {
-        if ( ( $this->type ??= Code::INLINE ) === Code::INLINE ) {
+    ) {
+        if ( Code::INLINE === ( $this->type ??= Code::INLINE ) ) {
             $this->component = new Element( 'code', $attributes );
             $this->component->class( 'inline', prepend : true );
             $this->string = \preg_replace( '#\s+#', WHITESPACE, $this->string );
@@ -50,8 +46,8 @@ class Code extends AbstractComponent
     protected function build() : string
     {
         if ( $this->tidyCode ) {
-            $this->string = replaceEach(
-                [ ' ), );' => ' ) );', ],
+            $this->string = Str::replaceEach(
+                [' ), );' => ' ) );'],
                 $this->string,
             );
         }
@@ -69,16 +65,16 @@ class Code extends AbstractComponent
             $content = $this->string;
         }
 
-        return ( string ) $this->component->content( $content );
+        return (string) $this->component->content( $content );
     }
 
     final protected function highlight( string $code, ?int $gutter = null ) : string
     {
-        if ( !$this->language || !$code ) {
+        if ( ! $this->language || ! $code ) {
             return EMPTY_STRING;
         }
 
-        if ( $this->type === Code::INLINE && $gutter ) {
+        if ( Code::INLINE === $this->type && $gutter ) {
             Log::warning( 'Inline code snippets cannot have a gutter' );
             $gutter = null;
         }
@@ -99,17 +95,17 @@ class Code extends AbstractComponent
         $type     = null;
         $language = null;
         $tidyCode = \array_key_exists( 'tidyCode', $attributes );
-        unset( $attributes[ 'tidyCode' ] );
+        unset( $attributes['tidyCode'] );
 
         $hasType = \array_search( 'inline', $exploded )
             ?: \array_search( 'block', $exploded );
 
         if ( \is_int( $hasType ) ) {
-            $type = $exploded[ $hasType ];
-            unset( $exploded[ $hasType ] );
+            $type = $exploded[$hasType];
+            unset( $exploded[$hasType] );
         }
 
-        if ( !empty( $exploded ) ) {
+        if ( ! empty( $exploded ) ) {
             $language = \implode( ', ', $exploded );
             unset( $exploded );
         }
@@ -117,12 +113,12 @@ class Code extends AbstractComponent
         return RenderRuntime::auxiliaryNode(
             renderName : Code::class,
             arguments  : [
-                             $node->htmlContent(),
-                             $language,
-                             $type,
-                             $tidyCode,
-                             $attributes,
-                         ],
+                $node->htmlContent(),
+                $language,
+                $type,
+                $tidyCode,
+                $attributes,
+            ],
         );
     }
 
@@ -132,9 +128,8 @@ class Code extends AbstractComponent
         ?string $type = null,
         bool    $tidyCode = true,
         array   $attributes = [],
-    ) : string
-    {
-        if ( !$string ) {
+    ) : string {
+        if ( ! $string ) {
             return EMPTY_STRING;
         }
 

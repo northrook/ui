@@ -4,22 +4,20 @@ namespace Northrook\UI\Component\Breadcrumbs;
 
 use IteratorAggregate;
 use Traversable;
+use ArrayIterator;
+use Countable;
 
-
-final class Trail implements \Countable, IteratorAggregate
+final class Trail implements Countable, IteratorAggregate
 {
-    /**
-     * @var Item[]
-     */
+    /** @var Item[] */
     private array $breadcrumbs = [];
 
     public function add(
-        string         $title,
-        ?string        $href = null,
-        array | string $class = [],
-        ?string        $icon = null,
-    ) : Trail
-    {
+        string       $title,
+        ?string      $href = null,
+        array|string $class = [],
+        ?string      $icon = null,
+    ) : Trail {
         $this->breadcrumbs[] = new Item( $title, $href, (array) $class, $icon );
         return $this;
     }
@@ -35,10 +33,10 @@ final class Trail implements \Countable, IteratorAggregate
     }
 
     /**
-     * @return \Traversable<Item>
+     * @return Traversable<Item>
      */
     public function getIterator() : Traversable
     {
-        return new \ArrayIterator( $this->breadcrumbs );
+        return new ArrayIterator( $this->breadcrumbs );
     }
 }

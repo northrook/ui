@@ -2,15 +2,11 @@
 
 namespace Northrook\UI\Component;
 
-use Latte\Compiler\Node;
 use Latte\Compiler\Nodes\AuxiliaryNode;
-use Latte\Compiler\Nodes\Html\ElementNode;
 use Northrook\HTML\Element;
-use Northrook\UI\Compiler\AbstractComponent;
-use Northrook\UI\Compiler\NodeCompiler;
+use Northrook\UI\Compiler\{AbstractComponent, NodeCompiler};
 use Northrook\UI\Component\Breadcrumbs\Trail;
 use Northrook\UI\RenderRuntime;
-
 
 /**
  * @link https://webmasters.stackexchange.com/a/79400 // HTML markup
@@ -21,18 +17,17 @@ use Northrook\UI\RenderRuntime;
  */
 class Breadcrumbs extends AbstractComponent
 {
-
     public const string SCHEMA = 'RDFa';
 
     private readonly ?Element $component;
-    public readonly Trail     $breadcrumbs;
+
+    public readonly Trail $breadcrumbs;
 
     final public function __construct(
         ?Trail                   $breadcrumbs = null,
         array                    $attributes = [],
         private readonly ?string $parent = null,
-    )
-    {
+    ) {
         $this->component = $parent ? new Element( $parent, $attributes ) : new Element( 'ol', $attributes );
         $this->component->class( 'breadcrumbs' );
         $this->breadcrumbs = $breadcrumbs ?? new Trail();
@@ -53,13 +48,13 @@ class Breadcrumbs extends AbstractComponent
 
             $breadcrumbs[] = Element::li(
                 content  : [
-                               $trail,
-                               Element::meta( property : 'position', content : $index + 1 ),
-                           ],
+                    $trail,
+                    Element::meta( property : 'position', content : $index + 1 ),
+                ],
                 attributes : [
-                               $item->classes,
-                               'itemListElement',
-                               'ListItem',]
+                    $item->classes,
+                    'itemListElement',
+                    'ListItem', ],
             )->toString();
         }
 
@@ -75,8 +70,7 @@ class Breadcrumbs extends AbstractComponent
         else {
             $this->component
                 ->content( $breadcrumbs )
-                ->attributes( $attributes )
-            ;
+                ->attributes( $attributes );
         }
 
         return $this->component;
@@ -87,27 +81,26 @@ class Breadcrumbs extends AbstractComponent
         return RenderRuntime::auxiliaryNode(
             renderName : Breadcrumbs::class,
             arguments  : [
-                             $node->arguments()[ 'breadcrumbs' ] ?? [],
-                             $node->attributes(),
-                             $node->tag( 'nav' ),
-                         ],
+                $node->arguments()['breadcrumbs'] ?? [],
+                $node->attributes(),
+                $node->tag( 'nav' ),
+            ],
         );
     }
 
     public static function runtimeRender(
-        array | Trail $breadcrumbs = [],
-        array         $attributes = [],
-        ?string       $tag = null,
-    ) : string
-    {
+        array|Trail $breadcrumbs = [],
+        array       $attributes = [],
+        ?string     $tag = null,
+    ) : string {
         return (string) new Breadcrumbs( $breadcrumbs, $attributes, $tag );
     }
 
-    static public function getAssets() : array
+    public static function getAssets() : array
     {
         return [
-            __DIR__ . '/Breadcrumbs/breadcrumbs.css',
-            __DIR__ . '/Breadcrumbs/breadcrumbs.js',
+            __DIR__.'/Breadcrumbs/breadcrumbs.css',
+            __DIR__.'/Breadcrumbs/breadcrumbs.js',
         ];
     }
 }

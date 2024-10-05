@@ -3,16 +3,14 @@
 namespace Northrook\UI\Component;
 
 use Latte\Compiler\Nodes\AuxiliaryNode;
-use Northrook\HTML\Element;
 use Northrook\HTML\Element\Attributes;
-use Northrook\HTML\Format;
 use Northrook\Time;
-use Northrook\UI\Compiler\AbstractComponent;
-use Northrook\UI\Compiler\NodeCompiler;
-use Northrook\UI\IconPack;
-use Northrook\UI\RenderRuntime;
-use function Northrook\filterHtmlText;
-use function Northrook\normalizeKey;
+use Northrook\UI\{IconPack, RenderRuntime};
+use Northrook\HTML\{Element, Format};
+use Northrook\UI\Compiler\{AbstractComponent, NodeCompiler};
+use Support\Normalize;
+use function String\filterHtml;
+
 /*
  # Accessibility
  : https://github.com/WICG/accessible-notifications
@@ -44,36 +42,40 @@ class Notification extends AbstractComponent
 {
     private array $instances = [];
 
-    public readonly string             $type;
-    public readonly string             $message;
-    public readonly ?string            $description;
-    public readonly Element\Attributes $attributes;
-    public ?int                        $timeout = null;
+    public readonly string $type;
+
+    public readonly string $message;
+
+    public readonly ?string $description;
+
+    public readonly Attributes $attributes;
+
+    public ?int $timeout = null;
 
     protected readonly Element $component;
 
     public function __construct(
-        string              $type = 'notice',
-        ?string             $message = null,
-        ?string             $description = null,
-        null | int | string $timeout = null,
-        array               $attributes = [],
-    )
-    {
-        $this->type        = filterHtmlText( $type );
-        $this->message     = filterHtmlText( $message ?? \ucfirst( $this->type ) );
-        $this->description = $description ? filterHtmlText( $description ) : null;
+        string          $type = 'notice',
+        ?string         $message = null,
+        ?string         $description = null,
+        null|int|string $timeout = null,
+        array           $attributes = [],
+    ) {
+        $this->type        = filterHtml( $type );
+        $this->message     = filterHtml( $message ?? \ucfirst( $this->type ) );
+        $this->description = $description ? filterHtml( $description ) : null;
         $this->setTimeout( $timeout );
         $this->component  = new Element( 'toast', $attributes );
         $this->attributes = $this->component->attributes;
-        $this->component->class( "notification", "intent:$type", prepend : true );
+
+        $this->component->class( 'notification', "intent:{$this->type()}", prepend : true );
 
         $this->instances[] = new Time();
     }
 
-    public function setTimeout( null | int | string $timeout ) : self
+    public function setTimeout( null|int|string $timeout ) : self
     {
-        if ( !\is_numeric( $timeout ) ) {
+        if ( ! \is_numeric( $timeout ) ) {
             $timeout = ( \strtotime( $timeout, 0 ) ) * 100;
         }
         $this->timeout = $timeout;
@@ -95,13 +97,14 @@ class Notification extends AbstractComponent
 
     protected function build() : string
     {
-        $type        = normalizeKey( $this->type );
-        $icon        = IconPack::get( $this->type, 'notice' );
+        $type = Normalize::key( $this->type );
+        $icon = IconPack::get( $this->type(), 'notice' );
+        // $message     = Format::inline( $this->message );
         $message     = Format::inline( $this->message );
         $description = $this->description ? Element::details(
             summary    : 'Description',
             content    : Format::newline( $this->description ),
-            attributes : [ 'class' => 'description' ],
+            attributes : ['class' => 'description'],
         ) : null;
 
         $content = <<<HTML
@@ -122,41 +125,51 @@ class Notification extends AbstractComponent
               </span>
             </output>
             {$description}
-        HTML;
+            HTML;
 
-        $this->component->attributes(
-            'timeout',
-            ( $this->timeout < 3500 )
-                ? 3500 : $this->timeout,
-        );
+        if ( $this->timeout ) {
+            $this->component->attributes(
+                'timeout',
+                ( $this->timeout < 3_500 )
+                            ? 3_500 : $this->timeout,
+            );
+        }
 
-        return ( string ) $this->component->content( $content );
+        return (string) $this->component->content( $content );
+    }
+
+    private function type() : string
+    {
+        return match ( $this->type ) {
+            'error' => 'danger',
+            default => $this->type,
+        };
     }
 
     /**
      * Retrieve the {@see Timestamp} object.
      *
-     * @return Time
      * @internal
+     * @return Time
      */
     private function timestamp() : Time
     {
-        return $this->instances[ \array_key_last( $this->instances ) ];
+        return $this->instances[\array_key_last( $this->instances )];
     }
 
     private function timestampWhen() : string
     {
-        $now       = time();
+        $now       = \time();
         $unix      = $this->timestamp()->unixTimestamp;
         $timestamp = $this->timestamp()->format( Time::FORMAT_HUMAN, true );
 
         // If this occurred less than 5 seconds ago, count it as now
         if ( ( $now - $unix ) < 5 ) {
-            return '<span class="datetime-when">Now</span><span class="datetime-timestamp">' . $timestamp . '</span>';
+            return '<span class="datetime-when">Now</span><span class="datetime-timestamp">'.$timestamp.'</span>';
         }
         // If this occurred less than 12 hours ago, it is 'today'
-        if ( ( $now - $unix ) < 43200 ) {
-            return '<span class="datetime-when">Today</span><span class="datetime-timestamp">' . $timestamp . '</span>';
+        if ( ( $now - $unix ) < 43_200 ) {
+            return '<span class="datetime-when">Today</span><span class="datetime-timestamp">'.$timestamp.'</span>';
         }
         // Otherwise print the whole day
         return $timestamp;
@@ -167,28 +180,29 @@ class Notification extends AbstractComponent
         return RenderRuntime::auxiliaryNode(
             renderName : Notification::class,
             arguments  : $node->properties(
-                             [ 'type' => 'notice' ], 'message', 'description', 'timeout',
-                         ),
+                ['type' => 'notice'],
+                'message',
+                'description',
+                'timeout',
+            ),
         );
     }
 
     public static function runtimeRender(
-        string              $type = 'notice',
-        ?string             $message = null,
-        ?string             $description = null,
-        null | int | string $timeout = null,
-        array               $attributes = [],
-    ) : string
-    {
-        return (string) new Notification( ... get_defined_vars() );
+        string          $type = 'notice',
+        ?string         $message = null,
+        ?string         $description = null,
+        null|int|string $timeout = null,
+        array           $attributes = [],
+    ) : string {
+        return (string) new Notification( ...\get_defined_vars() );
     }
 
-    static public function getAssets() : array
+    public static function getAssets() : array
     {
         return [
-            __DIR__ . '/Notification/notification.css',
-            __DIR__ . '/Notification/notification.js',
+            __DIR__.'/Notification/notification.css',
+            __DIR__.'/Notification/notification.js',
         ];
     }
-
 }

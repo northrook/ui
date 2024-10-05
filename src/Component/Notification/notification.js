@@ -1,61 +1,61 @@
-function notification() {
+App.event.ContentLoaded( () => {
 
-	const timeInMs = 250;
+	const tl = $all( 'toast' )
 
-	const notifications = $all( 'toast' );
+	if ( !tl.length ) return
 
-	if ( !notifications.length ) return;
+	const tc = $get(
+		'section#notifications',
+		{ class: 'fixed top right', role: 'list' },
+	).prependTo( document.body )
 
-	const container = $get( 'section#notifications', {class: 'fixed top right', role: 'list'} ).prependTo();
+	tl.forEach( ( t, i ) => {
 
-	// console.log( container );
+		console.log(t.animations())
 
-	notifications.forEach( ( toast, i ) => {
+		if ( !t.attr.style.get( '--timeout' ) ) {
 
-		if ( !toast.style.getPropertyValue( '--timeout' ) ) {
-
-			toast.classList.add( 'hidden' );
+			t.classList.add( 'hidden' )
 
 			const remove = () => {
-				const parent = toast.parentElement;
-				const transition = elementAnimations( toast );
+				const tp = t.parentElement
 
-				toast.classList.add( 'hidden' );
+				t.attr.class.add( 'hidden' )
 
-				toast.addEventListener( 'transitionend', ( transitionend ) => {
-					if ( transitionend.propertyName !== transition.longest.property ) return;
-					toast.remove();
-					if ( parent && parent.children.length === 0 ) parent.remove();
-				} );
+				t.on( 'transitionend', ( ta ) => {
+					if ( ta.propertyName !== t.animations().longest.property ) return
+					t.remove()
+					if ( tp && tp.children.length === 0 ) tp.remove()
+				} )
 			}
 
-			const timeout = parseInt( toast.getAttribute( 'timeout' ) ?? '0' );
+			const to = parseInt( t.attr.get( 'timeout' ) ?? '0' )
 
 			setTimeout( () => {
-				toast.classList.remove( 'hidden' );
+					t.attr.class.remove( 'hidden' )
 
-				if ( timeout ) {
+					if ( to ) {
 
-					const timeoutBar = $new( '<div class="progress-bar"></div>' );
-					toast.style.setProperty( '--timeout', timeout + 'ms' );
-					timeoutBar.appendTo( toast )
+						const tob = $new( '<div class="progress-bar"></div>' )
+						t.attr.style.set( '--timeout', to + 'ms' )
+						tob.appendTo( t )
 
-					toast.addEventListener( 'click', () => {
-						timeoutBar.fadeOut();
-						toast.setAttribute( 'timeout', 'stopped' );
-						toast.removeEventListener( 'animationend', remove );
-					}, {once: true} );
-					toast.addEventListener( 'animationend', remove, {once: true} );
-				}
-			}, timeInMs + ( i * ( timeInMs / 2 ) ) );
+						t.on( 'click', () => {
+							tob.fadeOut()
+							t.attr.set( 'timeout', 'stopped' )
+							t.off( 'animationend', remove )
+						}, { once: true } )
+						t.on( 'animationend', remove, { once: true } )
+					}
+				},
+				// The 250 the stagger time when rendering multiple toasts
+				250 + (i * (250 / 2)) )
 
-			$( 'button.close', toast ).on( 'click', remove );
-			// toast.querySelector( 'button.close' )?.addEventListener( 'click', remove );
+			t.$( 'button.close' ).on( 'click', remove )
 
-			container.appendChild( toast );
+			t.attr.set( 'role', 'listitem' )
+			t.appendTo( /** @type {HTMLElement} */ tc )
 
 		}
-	} );
-}
-
-App.event.ContentLoaded( notification );
+	} )
+}, true )

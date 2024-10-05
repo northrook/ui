@@ -1,14 +1,12 @@
 <?php
 
-declare( strict_types = 1 );
+declare(strict_types=1);
 
 namespace Northrook\UI\Compiler\Latte;
 
 use Latte\Compiler\Node;
-use Latte\Compiler\Nodes\Html\ElementNode;
 use Latte\Runtime\HtmlStringable;
 use Northrook\UI\Compiler\NodeCompiler;
-
 
 /**
  * @internal
@@ -17,8 +15,7 @@ use Northrook\UI\Compiler\NodeCompiler;
 interface RuntimeRenderInterface extends HtmlStringable
 {
     /**
-     *
-     * @param NodeCompiler  $node
+     * @param NodeCompiler $node
      *
      * @return Node
      */

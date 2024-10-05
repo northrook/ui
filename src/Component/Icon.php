@@ -9,7 +9,7 @@ use Northrook\UI\Compiler\NodeCompiler;
 use Northrook\UI\Component\Button\Type;
 use Northrook\UI\IconPack;
 use Northrook\UI\RenderRuntime;
-use const Northrook\EMPTY_STRING;
+use const Support\EMPTY_STRING;
 
 
 class Icon extends AbstractComponent

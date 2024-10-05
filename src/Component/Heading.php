@@ -1,53 +1,48 @@
-<?php /** @noinspection DuplicatedCode */
+<?php
+
+/** @noinspection DuplicatedCode */
 
 namespace Northrook\UI\Component;
 
 use JetBrains\PhpStorm\ExpectedValues;
-use Latte\Compiler\NodeHelpers;
 use Latte\Compiler\Nodes\AuxiliaryNode;
 use Latte\Compiler\Nodes\Html\ElementNode;
-use Northrook\HTML\Element;
-use Northrook\HTML\Format;
-use Northrook\HTML\HtmlNode;
-use Northrook\UI\Compiler\AbstractComponent;
-use Northrook\UI\Compiler\NodeCompiler;
+use Northrook\HTML\{Element, HtmlNode};
+use Northrook\UI\Compiler\{AbstractComponent, NodeCompiler};
+use Support\Str;
+use function String\stripTags;
+use function Support\toString;
+use const Support\{WHITESPACE};
 use Northrook\UI\RenderRuntime;
-use function Northrook\stringStartsWith;
-use function Northrook\stringStripTags;
-use function Northrook\toString;
-use const Northrook\EMPTY_STRING;
-use const Northrook\WHITESPACE;
-
-
+use LogicException;
 /**
  * @method static Heading H1( string|array $content, ?string $subheading = null, bool $hGroup = false, ...$attribute )
  * @method static Heading H2( string|array $content, ?string $subheading = null, bool $hGroup = false, ...$attribute )
  */
 final class Heading extends AbstractComponent
 {
-    private string  $heading;
+    private string $heading;
+
     private ?string $subheading;
 
     public function __construct(
-        #[ExpectedValues( [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ] )]
-        private string $level,
-        string | array $heading,
+        #[ExpectedValues( ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] )] private string $level,
+        string|array   $heading,
         ?string        $subheading = null,
         public bool    $subheadingBefore = false,
         public bool    $hGroup = false,
         private array  $attributes = [],
-    )
-    {
+    ) {
         $this->parseHeadingContent( $heading, $subheading );
     }
 
-    private function parseHeadingContent( string | array $heading, ?string $subheading ) : void
+    private function parseHeadingContent( string|array $heading, ?string $subheading ) : void
     {
         if ( \is_array( $heading ) ) {
             foreach ( $heading as $key => $value ) {
-                if ( stringStartsWith( $key, [ 'small', 'p' ] ) ) {
+                if ( Str::startsWith( $key, ['small', 'p'] ) ) {
                     $this->subheading( $value, \array_key_first( $heading ) === $key );
-                    unset( $heading[ $key ] );
+                    unset( $heading[$key] );
                 }
             }
         }
@@ -56,7 +51,7 @@ final class Heading extends AbstractComponent
 
         $heading = HtmlNode::unwrap( $heading, 'span' );
 
-        $this->heading    = $heading;
+        $this->heading = $heading;
         $this->subheading ??= $subheading;
     }
 
@@ -64,15 +59,14 @@ final class Heading extends AbstractComponent
     {
         $element = new Element(
             $this->hGroup ? 'hgroup' : $this->level,
-            $this->attributes + [ 'id' => $this->getHeadingText() ],
+            $this->attributes + ['id' => $this->getHeadingText()],
         );
 
-        $this->heading = $this->hGroup ? "<$this->level>$this->heading</$this->level>" : "<span>$this->heading</span>";
+        $this->heading = $this->hGroup ? "<{$this->level}>{$this->heading}</{$this->level}>" : "<span>{$this->heading}</span>";
 
         $element
             ->content( $this->heading )
-            ->content( $this->subheading, $this->subheadingBefore )
-        ;
+            ->content( $this->subheading, $this->subheadingBefore );
 
         // dump( (string) $element );
 
@@ -83,52 +77,55 @@ final class Heading extends AbstractComponent
     {
         $level = \strtolower( $level );
 
-        if ( \in_array( $level, [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ] ) ) {
+        if ( \in_array( $level, ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] ) ) {
             $attributes = [];
             $heading    = \array_shift( $arguments );
             $subheading = null;
             $hGroup     = false;
 
             foreach ( $arguments as $name => $attribute ) {
-                if ( $name === 'subheading' ) {
+                if ( 'subheading' === $name ) {
                     $subheading = $attribute;
-                    unset( $arguments[ $name ] );
+                    unset( $arguments[$name] );
                 }
-                if ( $name === 'hGroup' ) {
+                if ( 'hGroup' === $name ) {
                     $hGroup = $attribute;
-                    unset( $arguments[ $name ] );
+                    unset( $arguments[$name] );
                 }
             }
 
             return new Heading(
-                $level, $heading, $subheading, hGroup : $hGroup, attributes : $attributes,
+                $level,
+                $heading,
+                $subheading,
+                hGroup : $hGroup,
+                attributes : $attributes,
             );
         }
-        throw new \LogicException( "Undefined Heading level called: '$level' . " );
+        throw new LogicException( "Undefined Heading level called: '{$level}' . " );
     }
 
     public function getHeadingText() : string
     {
         if ( $this->hGroup ) {
-            return stringStripTags( $this->heading );
+            return stripTags( $this->heading );
         }
 
         $content = $this->subheadingBefore
-            ? [ $this->subheading, $this->heading ]
-            : [ $this->heading, $this->subheading ];
+            ? [$this->subheading, $this->heading]
+            : [$this->heading, $this->subheading];
 
-        return stringStripTags( toString( $content, ' ' ) );
+        return stripTags( toString( $content, ' ' ) );
     }
 
     public function subheading(
         ?string $string,
         bool    $before = false,
         ?bool   $hGroup = null,
-    ) : Heading
-    {
+    ) : Heading {
         $this->subheading       = \trim( $string );
         $this->subheadingBefore = $before;
-        if ( $hGroup !== null ) {
+        if ( null !== $hGroup ) {
             $this->hGroup = $hGroup;
         }
         return $this;
@@ -137,15 +134,16 @@ final class Heading extends AbstractComponent
     public static function nodeCompiler( NodeCompiler $node ) : AuxiliaryNode
     {
         foreach ( $node->iterateChildNodes() as $key => $childNode ) {
-            if ( $childNode instanceof ElementNode && in_array( $childNode->name, [ 'small', 'p' ] ) ) {
+            if ( $childNode instanceof ElementNode && \in_array( $childNode->name, ['small', 'p'] ) ) {
                 $classes = $childNode->getAttribute( 'class' );
 
                 $childNode->attributes->append(
                     $node::attributeNode(
-                        'class', [
-                        'subheading',
-                        $classes,
-                    ],
+                        'class',
+                        [
+                            'subheading',
+                            $classes,
+                        ],
                     ),
                 );
 

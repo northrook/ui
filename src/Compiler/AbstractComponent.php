@@ -2,23 +2,17 @@
 
 namespace Northrook\UI\Compiler;
 
-use Latte\Compiler\Node;
 use Northrook\HTML;
-use Northrook\HTML\Element\AttributeMethods;
 use Northrook\UI\Compiler\Latte\RuntimeRenderInterface;
 use Northrook\UI\Component\Icon;
 use Northrook\UI\RenderRuntime;
-use function Northrook\classBasename;
-use function Northrook\hashKey;
-use function Northrook\stringStartsWith;
-use function Northrook\toString;
-use const Northrook\WHITESPACE;
-
+use function String\hashKey;
+use function Support\classBasename;
+use const Support\WHITESPACE;
 
 abstract class AbstractComponent implements RuntimeRenderInterface
 {
-
-    private static function elementKey( string | int $element, string $valueType ) : string | int | null
+    private static function elementKey( string|int $element, string $valueType ) : string|int|null
     {
         if ( \is_int( $element ) ) {
             return $element;
@@ -27,7 +21,7 @@ abstract class AbstractComponent implements RuntimeRenderInterface
         $index = \strrpos( $element, ':' );
 
         // Treat parsed string variables as simple strings
-        if ( $valueType === 'string' && \str_starts_with( $element, '$' ) ) {
+        if ( 'string' === $valueType && \str_starts_with( $element, '$' ) ) {
             return (int) \substr( $element, $index++ );
         }
 
@@ -37,7 +31,7 @@ abstract class AbstractComponent implements RuntimeRenderInterface
     private static function appendTextString( string $value, array &$content ) : void
     {
         // Trim $value, and bail early if empty
-        if ( !$value = \trim( $value ) ) {
+        if ( ! $value = \trim( $value ) ) {
             return;
         }
 
@@ -50,24 +44,24 @@ abstract class AbstractComponent implements RuntimeRenderInterface
             }
         }
 
-        if ( isset( $content[ $index ] ) ) {
-            $content[ $index ] .= " $value";
+        if ( isset( $content[$index] ) ) {
+            $content[$index] .= " {$value}";
         }
         else {
-            $content[ $index ] = $value;
+            $content[$index] = $value;
         }
     }
 
-    private static function recursiveElement( array $array, null | string | int $key = null ) : string | array
+    private static function recursiveElement( array $array, null|string|int $key = null ) : string|array
     {
         // If $key is string, this iteration is an element
         if ( \is_string( $key ) ) {
             $tag        = \strrchr( $key, ':', true );
-            $attributes = $array[ 'attributes' ];
-            $array      = $array[ 'content' ];
+            $attributes = $array['attributes'];
+            $array      = $array['content'];
 
-            if ( \str_ends_with( $tag, 'icon' ) && $get = $attributes[ 'get' ] ?? null ) {
-                unset( $attributes[ 'get' ] );
+            if ( \str_ends_with( $tag, 'icon' ) && $get = $attributes['get'] ?? null ) {
+                unset( $attributes['get'] );
                 return (string) new Icon( $tag, $get, $attributes );
             }
         }
@@ -79,7 +73,7 @@ abstract class AbstractComponent implements RuntimeRenderInterface
             $elementTag = \strrpos( $elementKey, ':' );
 
             if ( \is_array( $value ) ) {
-                $content[ $elementKey ] = self::recursiveElement( $value, $elementKey );
+                $content[$elementKey] = self::recursiveElement( $value, $elementKey );
             }
             else {
                 static::appendTextString( $value, $content );
@@ -107,7 +101,7 @@ abstract class AbstractComponent implements RuntimeRenderInterface
 
     final protected function uniqueTemplateId() : string
     {
-        return hashKey( [ $this, \spl_object_id( $this ) ] );
+        return hashKey( [$this, \spl_object_id( $this )] );
     }
 
     /**

@@ -1,29 +1,30 @@
 <?php
 
-declare( strict_types = 1 );
+declare(strict_types=1);
 
 namespace Northrook\UI;
 
 use Psr\Cache\InvalidArgumentException;
+use Support\Normalize;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Component\Cache\CacheItem;
 use Latte\Compiler\Nodes\AuxiliaryNode;
 use Northrook\UI\Compiler\NodeExporter;
 use Northrook\Logger\Log;
-use Northrook\Minify;
-use function Northrook\{classBasename, hashKey, normalizeKey};
+use function String\hashKey;
+use function Support\classBasename;
 use const Cache\{AUTO, DISABLED, EPHEMERAL};
-
 
 /**
  * @internal
+ * @author Martin Nielsen <mn@northrook.com>
  */
 final class RenderRuntime
 {
     private const string METHOD = 'runtimeRender';
 
     /**
-     * `[ className => componentName ]`
+     * `[ className => componentName ]`.
      *
      * @var array<class-string, non-empty-string>
      */
@@ -32,14 +33,13 @@ final class RenderRuntime
     private static array $argumentCache = [];
 
     /**
-     * @param ?CacheInterface          $cache
-     * @param array{string, callable}  $argumentCallback
+     * @param ?CacheInterface         $cache
+     * @param array{string, callable} $argumentCallback
      */
     public function __construct(
         private readonly ?CacheInterface $cache = null,
         private array                    $argumentCallback = [],
-    )
-    {
+    ) {
         // Cleared on instantiation for concurrency compatability
         $this::$called = [];
 
@@ -52,14 +52,21 @@ final class RenderRuntime
         string $renderName,
         array  $arguments = [],
         ?int   $cache = AUTO,
-    ) : AuxiliaryNode
-    {
+    ) : AuxiliaryNode {
         return new AuxiliaryNode(
-            static fn() : string => 'echo $this->global->render->__invoke(
-                className: ' . NodeExporter::string( $renderName ) . ',
-                arguments: ' . NodeExporter::arguments( $arguments ) . ',
-                cache    : ' . NodeExporter::cacheConstant( $cache ) . '
-             );',
+            static fn() : string => <<<'EOD'
+                echo $this->global->render->__invoke(
+                                className: 
+                EOD.NodeExporter::string( $renderName ).<<<'EOD'
+                ,
+                                arguments: 
+                EOD.NodeExporter::arguments( $arguments ).<<<'EOD'
+                ,
+                                cache    : 
+                EOD.NodeExporter::cacheConstant( $cache ).<<<'EOD'
+
+                             );
+                EOD,
         );
     }
 
@@ -67,10 +74,9 @@ final class RenderRuntime
         string $className,
         array  $arguments = [],
         ?int   $cache = AUTO,
-    ) : ?string
-    {
+    ) : ?string {
 
-        if ( !$this->validate( $className ) ) {
+        if ( ! $this->validate( $className ) ) {
             return null;
         }
 
@@ -81,20 +87,16 @@ final class RenderRuntime
 
         $arguments = $this->invokedArguments( $className, $arguments );
 
-        if ( $cache === EPHEMERAL || $cache === DISABLED || !$this->cache ) {
-            return [ $className, $this::METHOD ]( ...$arguments );
+        if ( EPHEMERAL <= $cache || ! $this->cache ) {
+            return [$className, $this::METHOD]( ...$arguments );
         }
 
         try {
             return $this->cache->get(
-                normalizeKey( [ $className, hashKey( $arguments ) ], '.' ),
-                function( CacheItem $item ) use ( $className, $arguments, $cache ) : string
-                {
+                Normalize::key( [$className, hashKey( $arguments )], '.' ),
+                function( CacheItem $item ) use ( $className, $arguments, $cache ) : string {
                     $item->expiresAfter( $cache );
-                    $string = [ $className, $this::METHOD ]( ...$arguments );
-
-                    return $string;
-                    return Minify::HTML( $string );
+                    return [$className, $this::METHOD]( ...$arguments );
                 },
             );
         }
@@ -105,21 +107,19 @@ final class RenderRuntime
     }
 
     /**
-     *
-     *
-     * @param class-string  $className
-     * @param callable      $callback
+     * @param class-string $className
+     * @param callable     $callback
      *
      * @return void
      */
     public function addArgumentCallback( string $className, callable $callback ) : void
     {
-        $this->argumentCallback[ $className ] = $callback;
+        $this->argumentCallback[$className] = $callback;
     }
 
     private function validate( string $className ) : bool
     {
-        if ( !\method_exists( $className, $this::METHOD ) ) {
+        if ( ! \method_exists( $className, $this::METHOD ) ) {
             Log::error(
                 'Runtime invocation of {className} aborted; the class does not have the {method} method.',
                 [
@@ -139,17 +139,17 @@ final class RenderRuntime
 
     public static function registerInvocation( string $className ) : void
     {
-        if ( isset( RenderRuntime::$called[ $className ] ) ) {
+        if ( isset( RenderRuntime::$called[$className] ) ) {
             return;
         }
-        RenderRuntime::$called[ $className ] = classBasename( $className );
+        RenderRuntime::$called[$className] = classBasename( $className );
     }
 
     private function invokedArguments( string $className, array $arguments ) : array
     {
         if ( \array_key_exists( $className, $this->argumentCallback ) ) {
-            $cacheKey  = "$className:" . hashKey( $arguments );
-            $arguments = self::$argumentCache[ $cacheKey ] ??= ( $this->argumentCallback[ $className ] )( $arguments );
+            $cacheKey  = "{$className}:".hashKey( $arguments );
+            $arguments = self::$argumentCache[$cacheKey] ??= ( $this->argumentCallback[$className] )( $arguments );
         }
 
         return $arguments;

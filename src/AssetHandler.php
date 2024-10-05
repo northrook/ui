@@ -2,11 +2,9 @@
 
 namespace Northrook\UI;
 
-use Northrook\Assets\Script;
-use Northrook\Assets\Style;
+use Northrook\Assets\{Script, Style};
 use Northrook\Resource\Path;
-use function Northrook\normalizePath;
-
+use Support\Normalize;
 
 final class AssetHandler
 {
@@ -16,26 +14,25 @@ final class AssetHandler
     private array $assetDirectories = [];
 
     public function __construct(
-        string | array $assetDirectories = [],
-    )
-    {
+        string|array $assetDirectories = [],
+    ) {
         $this->addDirectory( $assetDirectories );
     }
 
     public static function register( string $name, string $component ) : void
     {
-        if ( !isset( AssetHandler::$calledComponents[ $name ] ) ) {
-            AssetHandler::$calledComponents[ $name ] = $component;
+        if ( ! isset( AssetHandler::$calledComponents[$name] ) ) {
+            AssetHandler::$calledComponents[$name] = $component;
         }
     }
 
-    private function addDirectory( string | array $directory ) : void
+    private function addDirectory( string|array $directory ) : void
     {
         foreach ( (array) $directory as $file ) {
-            if ( !\is_dir( $file ) ) {
+            if ( ! \is_dir( $file ) ) {
                 continue;
             }
-            $this->assetDirectories[] = normalizePath( $file );
+            $this->assetDirectories[] = Normalize::path( $file );
         }
     }
 
@@ -44,7 +41,7 @@ final class AssetHandler
         $assets = [];
 
         foreach ( RenderRuntime::getCalledInvocations() as $className => $component ) {
-            if ( !\method_exists( $className, 'getAssets' ) ) {
+            if ( ! \method_exists( $className, 'getAssets' ) ) {
                 continue;
             }
 
@@ -57,11 +54,11 @@ final class AssetHandler
             foreach ( $className::getAssets() as $asset ) {
                 $asset = new Path( $asset );
 
-                if ( !$asset->exists ) {
+                if ( ! $asset->exists ) {
                     continue;
                 }
 
-                $id = 'ui:' . \strtolower( $component );
+                $id = 'ui:'.\strtolower( $component );
 
                 $assets[] = match ( $asset->extension ) {
                     'css'   => new Style( $asset, $id ),

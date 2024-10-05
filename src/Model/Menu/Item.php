@@ -2,19 +2,16 @@
 
 namespace Northrook\UI\Model\Menu;
 
-use Northrook\HTML\Element;
-use Northrook\HTML\Format;
+use Northrook\HTML\{Element, Format};
 use Northrook\Trait\PropertyAccessor;
 use Northrook\UI\Compiler\Template;
 use Northrook\UI\IconPack;
 use Northrook\UI\Model\Menu;
-use function Northrook\escapeHtmlText;
-use function Northrook\filterUrl;
-use function Northrook\normalizeKey;
-use function Northrook\normalizeUrl;
-use function Northrook\toString;
-use const Northrook\EMPTY_STRING;
-
+use InvalidArgumentException;
+use Stringable;
+use Support\Normalize;
+use function String\{escapeHtml, filterUrl};
+use function Support\toString;
 
 /**
  * @property-read bool    $canRender
@@ -22,50 +19,56 @@ use const Northrook\EMPTY_STRING;
  * @property-read ?string $href
  * @property-read ?Item[] $item // Loop over each child item
  */
-final class Item implements \Stringable
+final class Item implements Stringable
 {
     use PropertyAccessor;
 
-
     private array $items = [];
 
-    public readonly string  $id;
-    public readonly string  $title;
+    public readonly string $id;
+
+    public readonly string $title;
+
     public readonly ?string $icon;
-    private ?string         $description;
-    private ?string         $link;
-    private bool            $isLink;
-    private ?string         $submenuId = null;
+
+    private ?string $description;
+
+    private ?string $link;
+
+    private bool $isLink;
+
+    private ?string $submenuId = null;
 
     /**
-     * @param string          $title
-     * @param ?string         $href
-     * @param ?string         $icon
-     * @param ?string         $description
-     * @param null|string     $id
-     * @param bool            $canRender
-     * @param null|Item|Menu  $parent
-     * @param null|Template   $template
+     * @param string         $title
+     * @param ?string        $href
+     * @param ?string        $icon
+     * @param ?string        $description
+     * @param null|string    $id
+     * @param ?bool          $isLink
+     * @param bool           $canRender
+     * @param null|Item|Menu $parent
+     * @param null|Template  $template
+     * @param array          $attributes
      */
     public function __construct(
-        string                     $title,
-        ?string                    $href = null,
-        ?string                    $icon = null,
-        ?string                    $description = null,
-        ?string                    $id = null,
-        ?bool                      $isLink = null,
-        private bool               $canRender = true,
-        private null | Item | Menu $parent = null,
-        private null | Template    $template = null,
-        private readonly array     $attributes = [],
-    )
-    {
-        $this->title       = escapeHtmlText( $title );
-        $this->id          = normalizeKey( $id ?? $this->title );
+        string                 $title,
+        ?string                $href = null,
+        ?string                $icon = null,
+        ?string                $description = null,
+        ?string                $id = null,
+        ?bool                  $isLink = null,
+        private bool           $canRender = true,
+        private null|Item|Menu $parent = null,
+        private ?Template      $template = null,
+        private readonly array $attributes = [],
+    ) {
+        $this->title       = escapeHtml( $title );
+        $this->id          = Normalize::key( $id ?? $this->title );
         $this->link        = $href ? filterUrl( $href ) : null;
         $this->isLink      = $isLink ?? $href;
         $this->icon        = $icon ? IconPack::get( $icon ) : null;
-        $this->description = Format::newline( escapeHtmlText( $description ) );
+        $this->description = Format::newline( escapeHtml( $description ) );
     }
 
     public function __get( string $property )
@@ -74,8 +77,8 @@ final class Item implements \Stringable
             'item'        => $this->items,
             'href'        => $this->link,
             'canRender'   => $this->canRender,
-            'hasChildren' => !empty( $this->items ),
-            default       => throw new \InvalidArgumentException( 'Unknown property: ' . $property ),
+            'hasChildren' => ! empty( $this->items ),
+            default       => throw new InvalidArgumentException( 'Unknown property: '.$property ),
         };
     }
 
@@ -83,7 +86,7 @@ final class Item implements \Stringable
     {
         foreach ( $item as $add ) {
             $add->parent( $this );
-            $this->items[ $add->id ] = $add;
+            $this->items[$add->id] = $add;
         }
         return $this;
     }
@@ -92,13 +95,13 @@ final class Item implements \Stringable
     {
         $item = Element::li(
             <<<HTML
-            <div class="title">
-              {$this->itemLabel( $parentHref )}
-            </div>
-            {$this->actions()}
-            {$this->description()}
-            {$this->nestedItems()}
-        HTML,
+                <div class="item">
+                  {$this->itemLabel( $parentHref )}
+                  {$this->actions()}
+                </div>
+                {$this->description()}
+                {$this->nestedItems()}
+                HTML,
             $this->attributes,
         );
 
@@ -107,21 +110,20 @@ final class Item implements \Stringable
         }
 
         $item
-            ->id( normalizeKey( [ $this->parent->id, $this->id ] ) )
-            ->class( 'menu-item', prepend : true )
-        ;
+            ->id( Normalize::key( [$this->parent->id, $this->id] ) )
+            ->class( 'menu-item', prepend : true );
 
         return $item;
     }
 
     private function description() : ?string
     {
-        if ( !$this->description ) {
+        if ( ! $this->description ) {
             return null;
         }
         return <<<HTML
             <div class="description">{$this->description}</div>
-        HTML;
+            HTML;
     }
 
     private function actions() : ?string
@@ -129,44 +131,38 @@ final class Item implements \Stringable
         $actions = [];
 
         if ( $this->hasChildren ) {
-            $this->submenuId = "$this->id-submenu";
+            $this->submenuId = Normalize::key( [$this->parent->id, $this->id, 'expandable'] );
             $actions[]       = Element::button(
-                <<<HTML
-                <svg class="icon toggle on direction:down" viewBox="0 0 16 16" fill="none" stroke="currentColor">
-                  <path class="chevron" stroke-linecap="round" stroke-linejoin="round" d=""></path>
-                </svg>
-                HTML
+                <<<'HTML'
+                    <svg class="icon toggle on direction:down" viewBox="0 0 16 16" fill="none" stroke="currentColor">
+                      <path class="chevron" stroke-linecap="round" stroke-linejoin="round" d=""></path>
+                    </svg>
+                    HTML
 
-                , [
-                'aria-controls' => $this->submenuId,
-                'aria-expanded' => 'false',
-            ],
+                ,
+                [
+                    'aria-controls' => $this->submenuId,
+                    'aria-expanded' => 'false',
+                ],
             );
         }
 
-        if ( !$actions ) {
-            return null;
-        }
-
-        $actions = toString( $actions );
-        return <<<HTML
-            <div class="group">{$actions}</div>
-        HTML;
+        return $actions ? toString( $actions ) : null;
     }
 
     private function link( ?string $parentHref ) : ?string
     {
-        if ( $parentHref === null ) {
+        if ( null === $parentHref ) {
             return $this->link;
         }
 
         $isAbsolute = false;
 
         if ( \str_starts_with( $this->link, './' ) ) {
-            return normalizeUrl( \trim( $this->link, './' ) );
+            return Normalize::url( \trim( $this->link, './' ) );
         }
 
-        return $this->link = normalizeUrl(
+        return $this->link = Normalize::url(
             "{$parentHref}/{$this->link}",
         );
     }
@@ -178,12 +174,12 @@ final class Item implements \Stringable
         if ( $this->link ) {
             $href = $this->link( $parentHref );
             return <<<HTML
-                {$icon}<a href="{$href}">{$this->title}</a>
+                {$icon}<a href="{$href}" class="title">{$this->title}</a>
                 HTML;
         }
         return <<<HTML
-                {$icon}<span>{$this->title}</span>
-                HTML;
+            {$icon}<span class="title">{$this->title}</span>
+            HTML;
     }
 
     private function nestedItems() : ?string
@@ -198,15 +194,16 @@ final class Item implements \Stringable
             $content[] = $item->render( $this->href );
         }
 
-        return Element::ol(
-            $content, [
-            'id'    => $this->submenuId,
-            'class' => 'submenu',
-        ],
+        return Element::ul(
+            $content,
+            [
+                'id'    => $this->submenuId,
+                'class' => 'expandable',
+            ],
         );
     }
 
-    public function parent( null | Item | Menu $set = null ) : null | Item | Menu
+    public function parent( null|Item|Menu $set = null ) : null|Item|Menu
     {
         if ( $set ) {
             $this->parent ??= $set;
@@ -214,9 +211,8 @@ final class Item implements \Stringable
         return $this->parent;
     }
 
-    public function __toString()
+    public function __toString() : string
     {
         return '[recursive generator]';
     }
-
 }

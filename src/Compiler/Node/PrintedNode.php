@@ -6,8 +6,8 @@ use Latte\Compiler\Node;
 use Latte\Compiler\PrintContext;
 use Latte\Essential\Nodes\PrintNode;
 use Northrook\Logger\Log;
-use function Northrook\pregExtract;
-use const Northrook\EMPTY_STRING;
+use Support\Str;
+use const Support\EMPTY_STRING;
 
 
 final class PrintedNode implements \Stringable
@@ -47,8 +47,8 @@ final class PrintedNode implements \Stringable
 
         // We may want to capture the whole {$variable ?: $withAny ?? [$rules]}
         // Parse and ensure it has a null-coalescing fallback
-        $this->variable     = pregExtract( '#\$(\w+)(?=\s*|:|\?|$)#', $this->value );
-        $this->expression   = pregExtract( '#\$(.+?)(?=\)|$)#', $this->value );
+        $this->variable     = Str::pregExtract( '#\$(\w+)(?=\s*|:|\?|$)#', $this->value );
+        $this->expression   = Str::pregExtract( '#\$(.+?)(?=\)|$)#', $this->value );
         $this->isExpression = true;
     }
 

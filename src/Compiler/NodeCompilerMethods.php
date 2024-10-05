@@ -1,19 +1,16 @@
 <?php
 
-declare( strict_types = 1 );
+declare(strict_types=1);
 
 namespace Northrook\UI\Compiler;
 
 use Latte\CompileException;
-use Latte\Compiler\Node;
-use Latte\Compiler\Nodes\FragmentNode;
+use Latte\Compiler\{Node, PrintContext};
+use Latte\Compiler\Nodes\{FragmentNode, TextNode};
 use Latte\Compiler\Nodes\Html\ElementNode;
-use Latte\Compiler\Nodes\TextNode;
-use Latte\Compiler\PrintContext;
 use Latte\Essential\Nodes\PrintNode;
 use Northrook\HTML\Element\Tag;
 use Northrook\Logger\Log;
-
 
 trait NodeCompilerMethods
 {
@@ -22,11 +19,11 @@ trait NodeCompilerMethods
      *
      * - Case-insensitive
      *
-     * @param string | Node  $element
+     * @param Node|string $element
      *
      * @return bool
      */
-    protected static function isImage( string | Node $element ) : bool
+    protected static function isImage( string|Node $element ) : bool
     {
         if ( $element instanceof Node ) {
             if ( $element instanceof ElementNode ) {
@@ -37,7 +34,7 @@ trait NodeCompilerMethods
             }
         }
 
-        return \in_array( \strtolower( $element ), [ 'img', 'picture' ], true );
+        return \in_array( \strtolower( $element ), ['img', 'picture'], true );
     }
 
     /**
@@ -45,11 +42,11 @@ trait NodeCompilerMethods
      *
      * - Case-insensitive
      *
-     * @param string | Node  $element
+     * @param Node|string $element
      *
      * @return bool
      */
-    protected static function isHeading( string | Node $element ) : bool
+    protected static function isHeading( string|Node $element ) : bool
     {
         if ( $element instanceof Node ) {
             if ( $element instanceof ElementNode ) {
@@ -69,26 +66,26 @@ trait NodeCompilerMethods
      * - Case-insensitive
      * - Will match namespaced tags by default
      *
-     * @param Node     $node
-     * @param ?string  $tag
-     * @param bool     $strict
+     * @param Node    $node
+     * @param ?string $tag
+     * @param bool    $strict
      *
      * @return bool
      */
     protected static function isElement( Node $node, ?string $tag = null, bool $strict = false ) : bool
     {
-        if ( !$node instanceof ElementNode ) {
+        if ( ! $node instanceof ElementNode ) {
             return false;
         }
 
-        if ( !$tag ) {
+        if ( ! $tag ) {
             return true;
         }
 
         $nodeTag = \strtolower( $node->name );
         $tag     = \strtolower( $tag );
 
-        if ( $strict === true || !\str_contains( $nodeTag, ':' ) ) {
+        if ( true === $strict || ! \str_contains( $nodeTag, ':' ) ) {
             return $nodeTag === $tag;
         }
         // dump( "$nodeTag : $tag", \str_starts_with( $nodeTag, $tag ) );
@@ -96,7 +93,7 @@ trait NodeCompilerMethods
         return \str_starts_with( $nodeTag, $tag );
     }
 
-    protected static function stringifyCodeContent( ElementNode | TextNode | PrintNode $node ) : ?string
+    protected static function stringifyCodeContent( ElementNode|TextNode|PrintNode $node ) : ?string
     {
         if ( $node instanceof TextNode ) {
             return $node->content;
@@ -112,13 +109,15 @@ trait NodeCompilerMethods
 
         if ( $node->content instanceof FragmentNode ) {
             $string = '';
+
             foreach ( $node->content->children as $childNode ) {
-                if ( $childNode instanceof TextNode && !\trim( $childNode->content ) ) {
+                if ( $childNode instanceof TextNode && ! \trim( $childNode->content ) ) {
                     continue;
                 }
 
                 if ( $childNode instanceof TextNode ) {
                     $string .= $childNode->content;
+
                     continue;
                 }
                 if ( $childNode instanceof ElementNode ) {
@@ -133,5 +132,4 @@ trait NodeCompilerMethods
 
         return null;
     }
-
 }
