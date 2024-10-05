@@ -4,7 +4,6 @@ namespace Northrook\UI\Model\Menu;
 
 use Northrook\HTML\{Element, Format};
 use Northrook\Trait\PropertyAccessor;
-use Northrook\UI\Compiler\Template;
 use Northrook\UI\IconPack;
 use Northrook\UI\Model\Menu;
 use InvalidArgumentException;
@@ -48,7 +47,6 @@ final class Item implements Stringable
      * @param ?bool          $isLink
      * @param bool           $canRender
      * @param null|Item|Menu $parent
-     * @param null|Template  $template
      * @param array          $attributes
      */
     public function __construct(
@@ -60,7 +58,6 @@ final class Item implements Stringable
         ?bool                  $isLink = null,
         private bool           $canRender = true,
         private null|Item|Menu $parent = null,
-        private ?Template      $template = null,
         private readonly array $attributes = [],
     ) {
         $this->title       = escapeHtml( $title );
