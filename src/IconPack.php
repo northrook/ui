@@ -5,9 +5,10 @@ namespace Northrook\UI;
 // :: The current icon pack - statically accessible
 
 use Northrook\HTML\Element;
+use Northrook\Interface\Singleton;
 use Northrook\Trait\SingletonClass;
 
-final class IconPack
+final class IconPack implements Singleton
 {
     use SingletonClass;
 
@@ -162,7 +163,7 @@ final class IconPack
     public function __construct()
     {
         $this->instantiationCheck();
-        $this::$instance = $this;
+        $this->instantiateSingleton();
     }
 
     public static function get(

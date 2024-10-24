@@ -2,6 +2,9 @@
 
 namespace Northrook\UI;
 
+use JetBrains\PhpStorm\Deprecated;
+
+#[Deprecated]
 class ComponentManager
 {
     public readonly IconPack $iconPack;

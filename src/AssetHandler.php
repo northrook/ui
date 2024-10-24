@@ -2,10 +2,12 @@
 
 namespace Northrook\UI;
 
+use JetBrains\PhpStorm\Deprecated;
 use Northrook\Assets\{Script, Style};
 use Northrook\Resource\Path;
 use Support\Normalize;
 
+#[Deprecated]
 final class AssetHandler
 {
     // Alternative locations for Component Assets
