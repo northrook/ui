@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Northrook\UI\Compiler\Latte;
 
+use JetBrains\PhpStorm\Deprecated;
 use Latte\Compiler\Node;
 use Latte\Runtime\HtmlStringable;
 use Northrook\UI\Compiler\NodeCompiler;
